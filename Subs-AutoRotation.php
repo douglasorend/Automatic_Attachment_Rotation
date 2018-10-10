@@ -47,8 +47,15 @@ function AutoRotation_GetOrientation($filename)
 //==============================================================================
 // Function dealing with Auto-Rotation of attachments:
 //==============================================================================
+function AutoRotation_Convert($size)
+{
+	$unit=array('B','KB','MB','GB','TB','PB');
+	return @round($size/pow(1024,($i=floor(log($size,1024)))),2).$unit[$i];
+}
+
 function AutoRotation_Process($filename, $orientation = false)
 {
+	global $context;
 	static $default_formats = array(
 		'1' => 'gif',
 		'2' => 'jpeg',
@@ -56,9 +63,6 @@ function AutoRotation_Process($filename, $orientation = false)
 		'6' => 'bmp',
 		'15' => 'wbmp'
 	);
-
-	// Attempt to raise the memory limit to 128MB:
-	@ini_set('memory_limit', '128M');
 
 	// Does the file even exist?  If not, return false!!
 	if (!file_exists($filename))
@@ -75,6 +79,16 @@ function AutoRotation_Process($filename, $orientation = false)
 		$orientation = AutoRotation_GetOrientation($filename);
 	if ($orientation < 2 || $orientation > 8)
 		return 1;
+
+	// Let's attempt to allocate enough memory for this:
+	if (function_exists('memory_get_usage'))
+	{
+		$memoryNeeded = $width * $height * 4 * 2;
+		if (memory_get_usage() + $memoryNeeded > (integer) ini_get('memory_limit') * pow(1024, 2))
+			@ini_set('memory_limit', (integer) ini_get('memory_limit') + ceil(((memory_get_usage() + $memoryNeeded) - (integer) ini_get('memory_limit') * pow(1024, 2)) / pow(1024, 2)) . 'M');
+		if (memory_get_usage() + $memoryNeeded > (integer) ini_get('memory_limit') * pow(1024, 2))
+			return false;
+	}
 
 	// Load up the image.  Abort if failure:
 	$imagecreatefrom = 'imagecreatefrom' . $format;

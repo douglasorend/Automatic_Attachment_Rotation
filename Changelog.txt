@@ -1,3 +1,6 @@
+v3.4 - August 5th, 2017
+o Added code to dynamically adjust memory to try to stop white screen issues.
+
 v3.3 - February 10th, 2017
 o Added code to attempt to get 128M of memory for our operations.
 o Changed forum code to attempt to get 128M instead of 90M.

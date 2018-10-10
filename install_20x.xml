@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>3.3</version>
+<version>3.4</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -174,10 +174,6 @@
 		<search position="before"><![CDATA[require_once($sourcedir . '/Subs-Package.php');]]></search>
 		<add><![CDATA[
 	require_once($sourcedir . '/Subs-AutoRotation.php');]]></add>
-	</operation>
-	<operation>
-		<search position="replace"><![CDATA[@ini_set('memory_limit', '90M');]]></search>
-		<add><![CDATA[@ini_set('memory_limit', '128M');]]></add>
 	</operation>
 	<operation>
 		<search position="before"><![CDATA[getimagesize($destination);]]></search>
