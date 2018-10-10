@@ -1,3 +1,7 @@
+v3.7.1 - September 12th, 2017
+o SMF 2.0: Fixed a syntax typo in [b]Sources/Display.php[/b]
+o SMF 2.1: Fixed a syntax typo in [b]Sources/Subs-Attachments.php[/b]
+
 v3.7 - September 12th, 2017
 o Resolved conflict with [url=http://custom.simplemachines.org/mods/index.php?mod=3770]Post and PM Inline Attachments[/url].  No functionality change.
 
