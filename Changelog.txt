@@ -1,3 +1,9 @@
+v3.0 - Unpublished
+o Added code to the post editing template to manually rotate images.
+o Added code to include timestamps on thumbnail URLs to circumvent browser caching.
+o Fixed rotation code to get image format instead of relying on database information.
+o Reduced potential database requests by merging attachment fetching database requests.
+
 v2.4 - October 12th, 2016
 o Removed code that may flag images as processed when they haven't been.
 o Added an additional check to make sure we only rotate [b]IMAGES[/b]!

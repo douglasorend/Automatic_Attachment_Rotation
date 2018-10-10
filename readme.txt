@@ -1,5 +1,5 @@
 [hr]
-[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v2.4[/b][/size][/color]
+[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v3.0[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4087]Link to Mod[/url]
 [/center]
 [hr]
@@ -14,8 +14,21 @@ In [b]Admin[/b] => [b]Forum[/b] => [b]Attachments and Avatars[/b]:
 o [b]Browse Files[/b]: There is a new column for image rotation.  Note that this column isn't shown when there are no images in the list.
 o [b]File Maintenance[/b]: There is a new section with a button to clear the orientation flags in the database.
 
+[color=blue][b][size=12pt][u]Post Screen Changes[/u][/size][/b][/color]
+Beside each attachment, there is a dropbox for image rotation, listing the options in the following section.
+
+[color=blue][b][size=12pt][u]Manual Rotation Options[/u][/size][/b][/color]
+o No Change
+o Horizontal Flip
+o Rotate 180 degrees
+o Vertical Flip
+o Vertical Flip, Rotate 270 degrees clockwise. (90 degrees counter-clockwise)
+o Rotate 270 degrees clockwise. (90 degrees counter-clockwise)
+o Horizontal Flip, Rotate 270 degrees clockwise. (90 degrees counter-clockwise)
+o Rotate 90 degrees clockwise.
+
 [color=blue][b][size=12pt][u]Compatibility Notes[/u][/size][/b][/color]
-This mod was tested on SMF 2.0.11 and 2.1 Beta 2, but should work on SMF 2.0 and up.  SMF 1.x is not and will not be supported.
+This mod was tested on SMF 2.0.12 and 2.1 Beta 2, but should work on SMF 2.0 and up.  SMF 1.x is not and will not be supported.
 
 [color=blue][b][size=12pt][u]Special Credit[/u][/size][/b][/color]
 This mod relies on the [url=http://www.phpclasses.org/package/1042-PHP-EXIF-information-reader-and-writer.html]phpExifRW[/url] class, which is licensed under the [url=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html]GNU Lesser General Public License[/url], in order to read the EXIF information from image files.  This class makes the requirement of having EXIF support built-in, which some servers do not have, not important to the task of successfully pulling the orientation out of the image file.  The [b]exifReader.inc[/b] file was renamed to [b]Class-exifReader.php[/b] in order to name the file in accordance with the naming convention of SMF and included in this mod.

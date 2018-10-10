@@ -12,7 +12,7 @@
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-if (!function_exists('imageflip')) 
+if (!function_exists('imageflip'))
 {
 	define('IMG_FLIP_HORIZONTAL', 0);
 	define('IMG_FLIP_VERTICAL', 1);
@@ -44,24 +44,37 @@ function AutoRotation_GetOrientation($filename)
 //==============================================================================
 // Function dealing with Auto-Rotation of attachments:
 //==============================================================================
-function AutoRotation_Process($filename, $format, $preferred_format = 0, $orientation = false)
+function AutoRotation_Process($filename, $orientation = false)
 {
+	static $default_formats = array(
+		'1' => 'gif',
+		'2' => 'jpeg',
+		'3' => 'png',
+		'6' => 'bmp',
+		'15' => 'wbmp'
+	);
+
+	// Does the file even exist?  If not, return false!!
+	if (!file_exists($filename))
+		return false;
+
 	// A known and supported format?
-	$format = str_replace('jpg', 'jpeg', $format);
-	if (!$format || !function_exists('imagecreatefrom' . $format) && file_exists($filename))
+	list($width, $height, $preferred_format, $attr) = @getimagesize($filename);
+	$format = isset($default_formats[$preferred_format]) ? $default_formats[$preferred_format] : false;
+	if (!$format || !function_exists('imagecreatefrom' . $format))
 		return false;
 
 	// Make sure it is an orientation that we can fix:
 	if ($orientation === false)
 		$orientation = AutoRotation_GetOrientation($filename);
 	if ($orientation < 2 || $orientation > 8)
-		return false;
+		return 1;
 
 	// Load up the image.  Abort if failure:
 	$imagecreatefrom = 'imagecreatefrom' . $format;
 	if (!($src_img = @$imagecreatefrom($filename)))
 		return false;
-		
+
 	// Rotate and/or flip the image so that it is correct:
 	$success = true;
 	if ($orientation == 2)		// -> Flipped horizontally
@@ -88,12 +101,9 @@ function AutoRotation_Process($filename, $format, $preferred_format = 0, $orient
 	// Make sure that we are still dealing with an image in memory!
 	if ($success && is_resource($src_img))
 	{
-		// Save the image as...
-		if (!empty($preferred_format) && ($preferred_format == 3) && function_exists('imagepng'))
-			$success = imagepng($src_img, $filename);
-		elseif (!empty($preferred_format) && ($preferred_format == 1) && function_exists('imagegif'))
-			$success = imagegif($src_img, $filename);
-		elseif (function_exists('imagejpeg'))
+		if (function_exists($func = 'image' . $format))
+			$success = @$func($src_img, $filename);
+		else
 			$success = imagejpeg($src_img, $filename);
 	}
 	if (is_resource($src_img))
@@ -104,7 +114,7 @@ function AutoRotation_Process($filename, $format, $preferred_format = 0, $orient
 //==============================================================================
 // Function dealing with Auto-Rotation of attachments during downloads:
 //==============================================================================
-function AutoRotation_Download($img_name, $img_ext, $id_thumb, $img_type)
+function AutoRotation_Download($img_name, $id_thumb, $img_type)
 {
 	global $smcFunc, $context;
 
@@ -114,7 +124,7 @@ function AutoRotation_Download($img_name, $img_ext, $id_thumb, $img_type)
 	{
 		// This is a thumbnail!  Drats...  Gotta find the original and process it, too.... :(
 		$request = $smcFunc['db_query']('', '
-			SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type
+			SELECT a.id_folder, a.filename, a.file_hash, a.id_attach
 			FROM {db_prefix}attachments AS a
 				INNER JOIN {db_prefix}attachments AS thumb ON (a.id_thumb = thumb.id_attach)
 			WHERE thumb.id_attach = {int:thumbnail}
@@ -123,17 +133,14 @@ function AutoRotation_Download($img_name, $img_ext, $id_thumb, $img_type)
 				'thumbnail' => $id_thumb,
 			)
 		);
-		if ($smcFunc['db_num_rows']($request) > 0)
+		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
-			// Get necessary information about the full-sized image:
-			list($id_folder, $real_filename, $image_hash, $img_ext, $id_attach, $attachment_type) = $smcFunc['db_fetch_row']($request);
-			$attachment = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $image_hash);
-
 			// Prevent other instances of the forum from processing the image right now:
 			AutoRotation_Update($id_attach);
 
 			// Let's process this full image properly now, then update the database:
-			$orientation = AutoRotation_Process($attachment, $img_ext);
+			$attachment = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+			$orientation = AutoRotation_Process($attachment);
 			$size = @getimagesize($attachment);
 			AutoRotation_Update($id_attach, $size[0], $size[1], $orientation);
 		}
@@ -144,7 +151,7 @@ function AutoRotation_Download($img_name, $img_ext, $id_thumb, $img_type)
 	AutoRotation_Update($id_thumb);
 
 	// Let's process this thumbnail properly now, then update the database:
-	AutoRotation_Process($img_name, $image_ext, 0, $orientation);
+	AutoRotation_Process($img_name, $orientation);
 	$size = @getimagesize($img_name);
 	AutoRotation_Update($id_thumb, $size[0], $size[1], $orientation);
 }
@@ -181,38 +188,21 @@ function AutoRotation_Display($row)
 
 	// Rotate this image if necessary:
 	$img = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-	$orientation = AutoRotation_Process($img, $row['file_ext']);
+	$orientation = AutoRotation_Process($img);
 	$size = @getimagesize($img);
 	AutoRotation_Update($row['id_attach'], $row['width'] = $size[0], $row['height'] = $size[1], $orientation);
 
 	// If there is a thumbnail that needs rotating, then let's rotate the thumbnail:
-	if (isset($row['thumb_rotation']) && empty($row['thumb_rotation']) && $orientation > 1)
+	if (!empty($row['thumb_id']) && $orientation > 1)
 	{
-		$request = $smcFunc['db_query']('', '
-			SELECT thumb.id_folder, thumb.filename, thumb.file_hash, thumb.fileext, thumb.id_attach, thumb.attachment_type
-			FROM {db_prefix}attachments AS thumb
-				INNER JOIN {db_prefix}attachments AS a ON (thumb.id_attach = a.id_thumb)
-			WHERE a.id_attach = {int:thumbnail}
-			LIMIT 1',
-			array(
-				'thumbnail' => $row['id_attach'],
-			)
-		);
-		if ($smcFunc['db_num_rows']($request) > 0)
-		{
-			// Get necessary information about the full-sized image:
-			list($id_folder, $real_filename, $image_hash, $img_ext, $id_attach, $attachment_type) = $smcFunc['db_fetch_row']($request);
-			$attachment = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $image_hash);
+		// Prevent other instances of the forum from processing the image right now:
+		AutoRotation_Update($row['thumb_id']);
 
-			// Prevent other instances of the forum from processing the image right now:
-			AutoRotation_Update($id_attach);
-
-			// Let's process this thumbnail properly now, then update the database:
-			AutoRotation_Process($attachment, $img_ext, 0, $orientation);
-			$size = @getimagesize($attachment);
-			AutoRotation_Update($id_attach, $row['thumb_width'] = $size[0], $row['thumb_height'] = $size[1], $orientation);
-		}
-		$smcFunc['db_free_result']($request);
+		// Let's process this thumbnail properly now, then update the database:
+		$img = getAttachmentFilename($row['thumb_filename'], $row['thumb_id'], $row['attach_folder'], false, $row['thumb_hash']);
+		AutoRotation_Process($img, $orientation);
+		$size = @getimagesize($img);
+		AutoRotation_Update($row['thumb_id'], $row['thumb_width'] = $size[0], $row['thumb_height'] = $size[1], $orientation);
 	}
 
 	// Return all this information back to the caller:
@@ -224,9 +214,9 @@ function AutoRotation_Display($row)
 //==============================================================================
 // Credit: Daniel Klein => http://php.net/manual/en/function.imageflip.php#118774
 //==============================================================================
-if (!function_exists('imageflip')) 
+if (!function_exists('imageflip'))
 {
-	function imageflip($image, $mode) 
+	function imageflip($image, $mode)
 	{
 		if ($mode == IMG_FLIP_HORIZONTAL)
 		{
@@ -234,7 +224,7 @@ if (!function_exists('imageflip'))
 			$half_x = $max_x / 2;
 			$sy = imagesy($image);
 			$temp_image = imageistruecolor($image) ? imagecreatetruecolor(1, $sy) : imagecreate(1, $sy);
-			for ($x = 0; $x < $half_x; ++$x) 
+			for ($x = 0; $x < $half_x; ++$x)
 			{
 				imagecopy($temp_image, $image, 0, 0, $x, 0, 1, $sy);
 				imagecopy($image, $image, $x, 0, $max_x - $x, 0, 1, $sy);
@@ -247,7 +237,7 @@ if (!function_exists('imageflip'))
 			$max_y = imagesy($image) - 1;
 			$half_y = $max_y / 2;
 			$temp_image = imageistruecolor($image) ? imagecreatetruecolor($sx, 1) : imagecreate($sx, 1);
-			for ($y = 0; $y < $half_y; ++$y) 
+			for ($y = 0; $y < $half_y; ++$y)
 			{
 				imagecopy($temp_image, $image, 0, 0, 0, $y, $sx, 1);
 				imagecopy($image, $image, 0, $y, 0, $max_y - $y, $sx, 1);
@@ -295,7 +285,7 @@ if (!function_exists('imagerotate'))
 		$y = $angle == 270 ? 0 : ($height < $width ? 0 : ($side - $width));
 		imagecopy($image, $imageSquare, 0, 0, $x, $y, $height, $width);
 		imagedestroy($imageSquare);
-		return $image;	
+		return $image;
 	}
 }
 
@@ -305,7 +295,9 @@ if (!function_exists('imagerotate'))
 function AutoRotation_AdminHook(&$subActions)
 {
 	global $context;
-	$context['autorotation_hook'] = $subActions['remove'];
+	loadLanguage('AutoRotation');
+	if (isset($subActions['remove']))
+		$context['autorotation_hook'] = $subActions['remove'];
 	$subActions['remove'] = 'AutoRotation_Rotate';
 	$subActions['clearflags'] = 'AutoRotation_Clear';
 }
@@ -321,56 +313,54 @@ function AutoRotation_Rotate()
 	if (!empty($_POST['orient']))
 	{
 		// Sanitize the inputs before we pass it to the database:
-		$tmp = array();
-		foreach ($_POST['orient'] as $attach => $orient)
-			$tmp[(int) $attach] = (int) $orient;
+		$attach = array();
+		foreach ($_POST['orient'] as $id => $orient)
+			$attach[(int) $id] = (int) $orient;
 
 		// This is a thumbnail!  Drats...  Gotta find the original and process it, too.... :(
 		$request = $smcFunc['db_query']('', '
-			SELECT 
-				a.id_attach, a.id_folder, a.file_hash, t.id_attach AS thumb_id, a.filename, a.fileext,
-				t.id_folder AS thumb_folder, t.file_hash AS thumb_hash, t.fileext as thumb_ext, t.filename AS thumb_name
+			SELECT
+				a.id_attach, a.id_folder, a.file_hash, a.filename, t.id_attach AS thumb_id,
+				t.id_folder AS thumb_folder, t.file_hash AS thumb_hash, t.filename AS thumb_name
 			FROM {db_prefix}attachments AS a
 				LEFT JOIN {db_prefix}attachments AS t ON (t.id_attach = a.id_thumb)
-			WHERE a.id_attach IN ({array_int:message_list})',
+			WHERE a.id_attach IN ({array_int:attach_list})
+				AND a.width > {int:zero}
+				AND a.height > {int:zero}',
 			array(
-				'message_list' => array_keys($tmp),
+				'attach_list' => array_keys($attach),
+				'zero' => 0,
 			)
 		);
 		while ($row = $smcFunc['db_fetch_assoc']($request))
 		{
-			// Get necessary information about the full-sized image:
-			$format = ($row['fileext'] == 'png' ? 3 : ($row['fileext'] == 'gif' ? 1 : 0));
-			$img = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-
 			// Prevent other instances of the forum from processing the image right now:
 			AutoRotation_Update($row['id_attach']);
 
 			// Let's process this image properly now, then update the database:
-			$orientation = AutoRotation_Process($img, $row['fileext'], $format, $tmp[$row['id_attach']]);
+			$img = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+			AutoRotation_Process($img, $orientation = $attach[$row['id_attach']]);
 			$size = @getimagesize($img);
 			AutoRotation_Update($row['id_attach'], $size[0], $size[1], $orientation);
 
 			// Also process the thumbnail (if available):
 			if (!empty($row['thumb_id']))
 			{
-				// Get necessary information about the full-sized image:
-				$format = ($row['thumb_ext'] == 'png' ? 3 : ($row['thumb_ext'] == 'gif' ? 1 : 0));
-				$img = getAttachmentFilename($row['thumb_name'], $row['thumb_attach'], $row['thumb_folder'], false, $row['thumb_hash']);
-
 				// Prevent other instances of the forum from processing the image right now:
 				AutoRotation_Update($row['thumb_id']);
 
 				// Let's process this thumbnail properly now, then update the database:
-				$orientation = AutoRotation_Process($img, $row['thumb_ext'], $format, $tmp[$row['thumb_id']]);
+				$img = getAttachmentFilename($row['thumb_name'], $row['thumb_id'], $row['thumb_folder'], false, $row['thumb_hash']);
+				AutoRotation_Process($img, $orientation);
 				$size = @getimagesize($img);
 				AutoRotation_Update($row['thumb_id'], $size[0], $size[1], $orientation);
 			}
 		}
+		$smcFunc['db_free_result']($request);
 	}
 
 	// Since we're chain-calling stuff, this MUST be called after processing the images!!!
-	if (is_callable($context['autorotation_hook']))
+	if (isset($context['autorotation_hook']) && is_callable($context['autorotation_hook']))
 		$context['autorotation_hook']();
 }
 
@@ -378,8 +368,11 @@ function AutoRotation_Clear()
 {
 	global $smcFunc, $context;
 
-	// Make sure that the session is valid, then clear orientation flags:
+	// Make sure that the session is valid and the user can manage attachments:
 	checkSession('get');
+	isAllowedTo('manage_attachments');
+
+	// Clear orientation flags, then go back to maintenance screen:
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}attachments
 		SET proper_rotation = {int:rotated}',
