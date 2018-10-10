@@ -1,5 +1,5 @@
 [hr]
-[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v2.3[/b][/size][/color]
+[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v2.4[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4087]Link to Mod[/url]
 [/center]
 [hr]
@@ -8,6 +8,11 @@
 This mod allows the automatic rotation and/or flipping of images [b]ONLY IF[/b] the EXIF information contained within (if such exists) indicates that such processing is required in order to show the picture upright.
 
 [b]NOTE:[/b] SMF contains an option called [b]Re-encode potentially dangerous image attachments[/b], which is turned on by default.  This re-encoding removes the orientation information from attachments (amongst other things), which means that attachments uploaded prior to this mod being installed will [b]NOT[/b] be able to rotated properly, as the EXIF information is missing from the re-encoded attachment file!
+
+[color=blue][b][size=12pt][u]Admin Changes[/u][/size][/b][/color]
+In [b]Admin[/b] => [b]Forum[/b] => [b]Attachments and Avatars[/b]:
+o [b]Browse Files[/b]: There is a new column for image rotation.  Note that this column isn't shown when there are no images in the list.
+o [b]File Maintenance[/b]: There is a new section with a button to clear the orientation flags in the database.
 
 [color=blue][b][size=12pt][u]Compatibility Notes[/u][/size][/b][/color]
 This mod was tested on SMF 2.0.11 and 2.1 Beta 2, but should work on SMF 2.0 and up.  SMF 1.x is not and will not be supported.

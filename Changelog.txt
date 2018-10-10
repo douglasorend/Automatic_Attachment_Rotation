@@ -1,3 +1,11 @@
+v2.4 - October 12th, 2016
+o Removed code that may flag images as processed when they haven't been.
+o Added an additional check to make sure we only rotate [b]IMAGES[/b]!
+o Added code in the admin attachment area to clear image orientation flags.
+o Added code to prevent double-processing of images and thumbnails.
+o Fixed excluded database fields in [b]Display.php[/b] database query.
+o SMF 2.0: Modified admin attachment code to hook the previous function used.
+
 v2.3 - September 26th, 2016
 o Added code to include timestamps on attachment URLs to circumvent browser caching.
 

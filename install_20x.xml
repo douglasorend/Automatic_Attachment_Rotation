@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>2.3</version>
+<version>2.4</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -14,9 +14,13 @@
 		]]></add>
 	</operation>
 	<operation>
+		<search position="after"><![CDATA[a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',]]></search>
+		<add><![CDATA[a.fileext as file_ext, a.proper_rotation AS img_rotation, ]]></add>
+	</operation>
+	<operation>
 		<search position="before"><![CDATA[IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
 		<add><![CDATA[,
-					a.proper_rotation AS img_rotation, thumb.proper_rotation AS thumb_rotation, thumb.fileext as thumb_ext, a.fileext as file_ext]]></add>
+					thumb.proper_rotation AS thumb_rotation, thumb.fileext as thumb_ext]]></add>
 	</operation>
 	<operation>
 		<search position="replace"><![CDATA[$temp[$row['id_attach']] = $row;]]></search>
@@ -72,8 +76,10 @@
 <file name="$sourcedir/ManageAttachments.php">
 	<!-- ManageAttachments function -->
 	<operation>
-		<search position="replace"><![CDATA['remove' => 'RemoveAttachment',]]></search>
-		<add><![CDATA['remove' => 'AutoRotation_Rotate',]]></add>
+		<search position="after"><![CDATA[// Pick the correct sub-action.]]></search>
+		<add><![CDATA[AutoRotation_AdminHook($subActions);
+	
+	]]></add>
 	</operation>
 	
 	<!-- BrowseFiles function -->
@@ -126,23 +132,37 @@
 	require_once($sourcedir . '/Subs-AutoRotation.php');]]></add>
 	</operation>
 	<operation>
-		<search position="before"><![CDATA[$sizes = @getimagesize($destination);]]></search>
+		<search position="before"><![CDATA[getimagesize($destination);]]></search>
 		<add><![CDATA[
 		$src_format = isset($sizes[2]) && isset($default_formats[$sizes[2]]) ? $default_formats[$sizes[2]] : false;
-		AutoRotation_Process($source, $src_format, $preferred_format);]]></add>
+		AutoRotation_Process($destination, $src_format, $preferred_format);]]></add>
 	</operation>
 	<operation>
-		<search position="before"><![CDATA[$sizes = @getimagesize($source);]]></search>
+		<search position="before"><![CDATA[getimagesize($source);]]></search>
 		<add><![CDATA[
 		$src_format = isset($sizes[2]) && isset($default_formats[$sizes[2]]) ? $default_formats[$sizes[2]] : false;
 		AutoRotation_Process($source, $src_format, $preferred_format);]]></add>
 	</operation>
 </file>
-<file name="$sourcedir/Subs-Post.php">
+<file name="$themedir/ManageAttachments.template.php">
 	<operation>
-		<search position="before"><![CDATA[UPDATE {db_prefix}attachments
-			SET id_msg = {int:id_msg}]]></search>
-		<add><![CDATA[, proper_rotation = 1]]></add>
+		<search position="before"><![CDATA[<input type="hidden" name="type" value="avatars" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="sa" value="byAge" />]]></search>
+		<add><![CDATA[
+				</form>
+			</div>
+			<span class="botslice"><span></span></span>
+		</div>
+		<div class="cat_bar">
+			<h3 class="catbg">', $txt['attachment_clear_rotation_title'], '</h3>
+		</div>
+		<div class="windowbg">
+			<span class="topslice"><span></span></span>
+			<div class="content">
+				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=clearflags;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
+					<p>', $txt['attachment_clear_rotation_desc'], '</p>
+					<input type="submit" name="submit" value="', $txt['attachment_clear_rotation_button'], '" class="button_submit" />]]></add>
 	</operation>
 </file>
 </modification>
