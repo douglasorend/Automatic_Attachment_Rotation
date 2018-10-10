@@ -1,3 +1,8 @@
+v3.11 - February 20th, 2018
+o Updated Spanish Latin translations, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=322597]Rock Lee[/url].
+o Changed rotation/flip strings for better understandability, per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url]'s post above.
+o Changed order of rotation/flip strings in templates, per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url]'s post above.
+
 v3.10 - February 17th, 2018
 o Included "Non well-formed number" fix by [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], as discussed [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3958439#msg3958439]here[/url].
 

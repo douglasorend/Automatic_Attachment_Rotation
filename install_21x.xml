@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>3.10</version>
+<version>3.11</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -88,7 +88,7 @@
 				'data' => array(
 					'function' => function ($rowData) use ($txt)
 					{
-						$str = sprintf('<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option></select>', $rowData['id_attach']);
+						$str = sprintf('<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option></select>', $rowData['id_attach']);
 						return !empty($rowData['width']) && !empty($rowData['height']) ? $str : false;
 					},
 					'style' => 'text-align: center',
@@ -214,7 +214,7 @@
 <file name="$themedir/Post.template.php">
 	<operation>
 		<search position="before"><![CDATA[class="input_check"> ', $attachment['name'], ]]></search>
-		<add><![CDATA[' (', $txt['img_orientation'], ': ', sprintf('<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option></select>', $attachment['id']), ')', ]]></add>
+		<add><![CDATA[' (', $txt['img_orientation'], ': ', sprintf('<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option></select>', $attachment['id']), ')', ]]></add>
 	</operation>
 </file>
 </modification>
