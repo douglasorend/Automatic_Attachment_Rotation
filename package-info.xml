@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>Dougiefresh:AutoRotation</id>
+	<name>Automatic Attachment Rotation</name>
+	<type>modification</type>
+	<version>1.0</version>
+
+	<install for="2.0 - 2.0.99, 2.1 Beta 2">
+		<readme parsebbc="true">readme.txt</readme>
+		<modification>install.xml</modification>
+		<require-file name="Class-exifReader.php" destination="$sourcedir" />
+	</install>
+	<uninstall for="2.0 - 2.0.99, 2.1 Beta 2">
+		<modification reverse="true">install.xml</modification>
+		<remove-file name="$sourcedir/Class-exifReader.php" />		
+	</uninstall>
+</package-info>
