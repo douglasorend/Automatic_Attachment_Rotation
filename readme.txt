@@ -1,5 +1,5 @@
 [hr]
-[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v1.1[/b][/size][/color]
+[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v1.2[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4087]Link to Mod[/url]
 [/center]
 [hr]
@@ -14,6 +14,8 @@ This mod was tested on SMF 2.0.11 and 2.1 Beta 2, but should work on SMF 2.0 and
 
 [color=blue][b][size=12pt][u]Special Credit[/u][/size][/b][/color]
 This mod relies on the [url=http://www.phpclasses.org/package/1042-PHP-EXIF-information-reader-and-writer.html]phpExifRW[/url] class, which is licensed under the [url=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html]GNU Lesser General Public License[/url], in order to read the EXIF information from image files.  This class makes the requirement of having EXIF support built-in, which some servers do not have, not important to the task of successfully pulling the orientation out of the image file.  The [b]exifReader.inc[/b] file was renamed to [b]Class-exifReader.php[/b] in order to name the file in accordance with the naming convention of SMF and included in this mod.
+
+Test images with EXIF orientation values embedded in them are available at [url=http://www.galloway.me.uk/2012/01/uiimageorientation-exif-orientation-sample-images/]Galloway.me.uk[/url] and at the [url=http://www.elkarte.net/community/index.php?topic=2509.0] Image Orientation[/url] thread over at the ElkArte forum.
 
 [color=blue][b][size=12pt][u]Changelog[/u][/size][/b][/color]
 The changelog has been removed and can be seen at [url=http://www.xptsp.com/board/index.php?topic=662.msg975#msg975]XPtsp.com[/url].
