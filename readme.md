@@ -6,32 +6,33 @@
 
 --------
 
-**## Introduction**
+## Introduction
 This mod allows the automatic rotation and/or flipping of images **ONLY IF** the EXIF information contained within (if such exists) indicates that such processing is required in order to show the picture  in the correct orientation.
 
 **NOTE:** SMF contains an option called **Re-encode potentially dangerous image attachments**, which is turned on by default.  This re-encoding removes the orientation information from attachments (amongst other things), which means attachments uploaded prior to this mod being installed will **NOT** be able to rotated properly, as the EXIF information is missing from the re-encoded attachment file!
 
-**Major changes introduced in v4.0**
-o Option to enable/disable automatic image rotation.
-o Code update to enable automatic image resizing/reformatting in posts (and PMs if the [PM Attachments](https://custom.simplemachines.org/mods/index.php?mod=1974) mod is installed).
+### Major changes introduced in v4.0
 
-**Major change introduced in v5.0**
-o Option to automatically, manually or batch resize/reformat existing images using 'Attachment Settings' options (non-JPEG images will only be reformatted to JPEG if the *Reformat non-JPEG images to JPEG* option is enabled).
+- Option to enable/disable automatic image rotation.
+- Code update to enable automatic image resizing/reformatting in posts (and PMs if the [PM Attachments](https://custom.simplemachines.org/mods/index.php?mod=1974) mod is installed).
 
+### Major change introduced in v5.0
 
-**## Post Screen Changes**
+- Option to automatically, manually or batch resize/reformat existing images using 'Attachment Settings' options (non-JPEG images will only be reformatted to JPEG if the *Reformat non-JPEG images to JPEG* option is enabled).
+
+## Post Screen Changes
 Beside each image attachment a dropbox will be displayed listing the following rotation options:
-o No Change
-o Rotate 90[sup]o[/sup] Right
-o Rotate 90[sup]o[/sup] Left
-o Rotate 180[sup]o[/sup]
-o Horizontal Flip
-o Vertical Flip
-o Horizontal Flip, Rotate 90[sup]o[/sup] Right
-o Vertical Flip, Rotate 90[sup]o[/sup] Right
 
+- No Change
+- Rotate 90[sup]o[/sup] Right
+- Rotate 90[sup]o[/sup] Left
+- Rotate 180[sup]o[/sup]
+- Horizontal Flip
+- Vertical Flip
+- Horizontal Flip, Rotate 90[sup]o[/sup] Right
+- Vertical Flip, Rotate 90[sup]o[/sup] Right
 
-**## Automatic Resizing of Existing Images**
+## Automatic Resizing of Existing Images
 When a post is dispayed, and if the Attachment Setting *Resize existing images* option is enabled, images in the post will be automatically resized (and reformatted to JPEG if the Attachment Setting option *Reformat non-JPEG images to JPEG* is enabled) using the same Attachment Setting options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or maximum width/height) that are applied to new image attachments in posts.  In addition, if the Attachment Setting option *Create backup of original image file when resizing* is also enabled the original image file will be saved to the attachments directiory with the extension '.rei'.
 
 ## Manual Resizing of Existing Images
@@ -48,25 +49,27 @@ o *Admin => Forum => Attachments and Avatars => Attachment Settings* - Maximum s
 o *Admin => Forum => Attachments and Avatars => File Maintenance => Attachment Integrity Check* should be run and issues corrected.
 
 **Important notes for batch resizing:**
-o Non-JPEG images will **only** be reformatted to JPEG if the *Reformat non-JPEG images to JPEG* option is enabled.
-o Existing *'attachments'* database table will be copied to *'attachmentsPreREI'* database table. *
-o Original image files are saved to the *'attachmentsPreREI'* directory/folder. *
-o File timestamp for resized image file is set to match timestamp of original image file.
-o Batch processing progress information is displayed and updated.
-o The results of the batch resizing process will be displayed on completion and also written to the forum error log file.
 
-* The *'attachmentsPreREI'* database table and directory/folder can be removed after checks have been done to confirm successful resizing - this will free up additional disk space on the server.
+- Non-JPEG images will **only** be reformatted to JPEG if the *Reformat non-JPEG images to JPEG* option is enabled.
+- Existing *'attachments'* database table will be copied to *'attachmentsPreREI'* database table. *
+- Original image files are saved to the *'attachmentsPreREI'* directory/folder. *
+- File timestamp for resized image file is set to match timestamp of original image file.
+- Batch processing progress information is displayed and updated.
+- The results of the batch resizing process will be displayed on completion and also written to the forum error log file.
+- The *'attachmentsPreREI'* database table and directory/folder can be removed after checks have been done to confirm successful resizing - this will free up additional disk space on the server.
 
 The forum should be configured as follows **after** batch resizing has finished:
-o *Admin => Configuration => Security and Moderation => General => Disable administration security* should be **enabled**.
-o *Admin => Configuration => Server Settings => General => Enable Maintenance Mode* should be **disabled**.
-o *Admin => Forum => Posts and Topics => Topic Settings => Number of posts per page in a topic page* should be configured to previous value.
+
+- *Admin => Configuration => Security and Moderation => General => Disable administration security* should be **enabled**.
+- *Admin => Configuration => Server Settings => General => Enable Maintenance Mode* should be **disabled**.
+- *Admin => Forum => Posts and Topics => Topic Settings => Number of posts per page in a topic page* should be configured to previous value.
 
 ## Admin Changes
 In **Admin => Forum => Attachments and Avatars**:
-o **Browse Files**: There is a new column (and associated button) for rotating/flipping images - the options for rotating/flipping images are only shown for image attachments.  There is also a new horizontal tab labelled *'Resize Existing Images'* that can be used for manually resizing/reformatting existing images.
-o **Attachment Settings**: Options to enable/disable automatic image rotation and automatic resizing of existing images, option to reformat non-JPEG images to JPEG and options to set JPEG quality factor and max width/height values for attached images.
-o **File Maintenance**: There is a new section for *Batch Resize Existing Images*.  There is also a new section for *Reset Orientation Flag*.
+
+- **Browse Files**: There is a new column (and associated button) for rotating/flipping images - the options for rotating/flipping images are only shown for image attachments.  There is also a new horizontal tab labelled *'Resize Existing Images'* that can be used for manually resizing/reformatting existing images.
+- **Attachment Settings**: Options to enable/disable automatic image rotation and automatic resizing of existing images, option to reformat non-JPEG images to JPEG and options to set JPEG quality factor and max width/height values for attached images.
+- **File Maintenance**: There is a new section for *Batch Resize Existing Images*.  There is also a new section for *Reset Orientation Flag*.
 
 ## Compatibility Notes
 This mod was tested on SMF 2.0.15 but should work on SMF 2.0 and up.
@@ -81,8 +84,9 @@ The [Improved Attachment Error Handling](https://custom.simplemachines.org/mods/
 The [Resize Attachment Images](https://custom.simplemachines.org/mods/index.php?mod=2206) mod **MUST** be uninstalled prior to installing this version as the two mods are not compatible (this mod contains similar and updated functionality).
 
 ## Translators
-o Dutch: [@rjen](https://www.simplemachines.org/community/index.php?action=profile;u=287786)
-o Spanish Latin: [Rock Lee](https://www.simplemachines.org/community/index.php?action=profile;u=322597).
+
+- Dutch: [@rjen](https://www.simplemachines.org/community/index.php?action=profile;u=287786)
+- Spanish Latin: [Rock Lee](https://www.simplemachines.org/community/index.php?action=profile;u=322597).
 
 ## Special Credit
 This mod relies on the [phpExifRW](http://www.phpclasses.org/package/1042-PHP-EXIF-information-reader-and-writer.html) class, which is licensed under the [GNU Lesser General Public License](http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html), in order to read the EXIF information from image files.  This class makes the requirement of having EXIF support built-in, which some servers do not have, not important to the task of successfully pulling the orientation out of the image file.  The **exifReader.inc** file was renamed to **Class-exifReader.php** in order to name the file in accordance with the naming convention of SMF and included in this mod.
