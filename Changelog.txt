@@ -1,3 +1,6 @@
+v5.6 - May 21st, 2018
+o Fixed undefined variable error in [b]Class-exifReader.php[/b].
+
 V5.5 - May 7th, 2018
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970888#msg3970888]Rock Lee[/url] - updated/added Spanish langage files.
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3971411#msg3971411]The QE2 Story Forum[/url] and [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3971413#msg3971413]Tonyvic[/url] - added note about [i]"Attachment Settings => Re-encode potentially dangerous image attachments"[/i] setting in relation to this mod.
