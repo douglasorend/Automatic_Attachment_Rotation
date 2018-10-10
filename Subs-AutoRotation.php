@@ -86,8 +86,8 @@ function AutoRotation_Process($filename, $orientation = false)
 		$info['channels'] = !empty($info['channels']) ? $info['channels'] : 4;
 		$memoryNeeded = ceil($width * $height * $info['bits'] * $info['channels'] / 8 * 2);
 		$currentMemory = memory_get_usage() + $memoryNeeded;
-		$memoryLimit = ini_get('memory_limit');
-		$memoryRequested = (int) $memoryLimit + ceil(($currentMemory - $memoryLimit * pow(1024, 2)) / pow(1024, 2));
+		$memoryLimit = (int) ((float) ini_get('memory_limit'));
+		$memoryRequested = $memoryLimit + ceil(($currentMemory - $memoryLimit * pow(1024, 2)) / pow(1024, 2));
 		
 		// Do we have enough memory?  If not, try to allocate enough:
 		if ($currentMemory > (integer) ini_get('memory_limit') * pow(1024, 2))

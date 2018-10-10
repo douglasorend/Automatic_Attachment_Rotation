@@ -1,5 +1,8 @@
+v3.10 - February 17th, 2018
+o Included "Non well-formed number" fix by [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], as discussed [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3958439#msg3958439]here[/url].
+
 v3.9 - February 13th, 2018
-o Updated Spanish Latin translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=322597]Rock Lee[/url].
+o Added Spanish Latin translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=322597]Rock Lee[/url].
 o Added translators section to [b]README.txt[/b].
 o Added [b]LICENSE.txt[/b] to satisfy licensing concerns.
 
