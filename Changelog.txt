@@ -1,3 +1,7 @@
+v5.7 - October 10th, 2018
+o No functionality change.
+o Updated documentation to point to new website.
+
 v5.6 - May 21st, 2018
 o Fixed undefined variable error in [b]Class-exifReader.php[/b].
 
