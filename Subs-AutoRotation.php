@@ -57,6 +57,9 @@ function AutoRotation_Process($filename, $orientation = false)
 		'15' => 'wbmp'
 	);
 
+	// Attempt to raise the memory limit to 128MB:
+	@ini_set('memory_limit', '128M');
+
 	// Does the file even exist?  If not, return false!!
 	if (!file_exists($filename))
 		return false;
