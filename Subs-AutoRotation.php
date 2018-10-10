@@ -12,87 +12,11 @@
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-//==============================================================================
-// This replacement "imageflip" function gets used when using PHP < 5.5.
-// Credit: Daniel Klein => http://php.net/manual/en/function.imageflip.php#118774
-//==============================================================================
 if (!function_exists('imageflip')) 
 {
 	define('IMG_FLIP_HORIZONTAL', 0);
 	define('IMG_FLIP_VERTICAL', 1);
 	define('IMG_FLIP_BOTH', 2);
-
-	function imageflip($image, $mode) 
-	{
-		if ($mode == IMG_FLIP_HORIZONTAL)
-		{
-			$max_x = imagesx($image) - 1;
-			$half_x = $max_x / 2;
-			$sy = imagesy($image);
-			$temp_image = imageistruecolor($image) ? imagecreatetruecolor(1, $sy) : imagecreate(1, $sy);
-			for ($x = 0; $x < $half_x; ++$x) 
-			{
-				imagecopy($temp_image, $image, 0, 0, $x, 0, 1, $sy);
-				imagecopy($image, $image, $x, 0, $max_x - $x, 0, 1, $sy);
-				imagecopy($image, $temp_image, $max_x - $x, 0, 0, 0, 1, $sy);
-			}
-		}
-		elseif ($mode == IMG_FLIP_VERTICAL)
-		{
-			$sx = imagesx($image);
-			$max_y = imagesy($image) - 1;
-			$half_y = $max_y / 2;
-			$temp_image = imageistruecolor($image) ? imagecreatetruecolor($sx, 1) : imagecreate($sx, 1);
-			for ($y = 0; $y < $half_y; ++$y) 
-			{
-				imagecopy($temp_image, $image, 0, 0, 0, $y, $sx, 1);
-				imagecopy($image, $image, 0, $y, 0, $max_y - $y, $sx, 1);
-				imagecopy($image, $temp_image, 0, $max_y - $y, 0, 0, $sx, 1);
-			}
-		}
-		elseif ($mode == IMG_FLIP_BOTH)
-		{
-			$sx = imagesx($image);
-			$sy = imagesy($image);
-			$temp_image = imagerotate($image, 180, 0);
-			imagecopy($image, $temp_image, 0, 0, 0, 0, $sx, $sy);
-		}
-		else
-			return false;
-
-		imagedestroy($temp_image);
-		return $image;
-	}
-}
-
-//==============================================================================
-// This replacement "imagerotate" function gets used when using PHP < 4.3.
-// NOTE: Parameters "bgd_color" and "ignore_transparent" are complete;y ignored!
-//==============================================================================
-// Credit: Ajenbo => http://php.net/manual/en/function.imagerotate.php#85329
-//==============================================================================
-if (!function_exists('imagerotate'))
-{
-	function imagerotate($image, $angle, $bgd_color = NULL, $ignore_transparent = NULL)
-	{
-		if ($angle == 180)
-			return imagerotate(imagerotate($image, 90), 90);
-		if ($angle != 270 && $angle != 90)
-			return $image;
-		$width = imagesx($image);
-		$height = imagesy($image);
-		$side = $width > $height ? $width : $height;
-		$imageSquare = imagecreatetruecolor($side, $side);
-		imagecopy($imageSquare, $image, 0, 0, 0, 0, $width, $height);
-		imagedestroy($image);
-		$imageSquare = imagerotate($imageSquare, $angle, 0, -1);
-		$image = imagecreatetruecolor($height, $width);
-		$x = $angle == 90 ? 0 : ($height > $width ? 0 : ($side - $height));
-		$y = $angle == 270 ? 0 : ($height < $width ? 0 : ($side - $width));
-		imagecopy($image, $imageSquare, 0, 0, $x, $y, $height, $width);
-		imagedestroy($imageSquare);
-		return $image;	
-	}
 }
 
 //==============================================================================
@@ -124,7 +48,7 @@ function AutoRotation_Process($filename, $format, $preferred_format = 0, $orient
 {
 	// A known and supported format?
 	$format = str_replace('jpg', 'jpeg', $format);
-	if (!$format || !function_exists('imagecreatefrom' . $format))
+	if (!$format || !function_exists('imagecreatefrom' . $format) && file_exists($filename))
 		return false;
 
 	// Make sure it is an orientation that we can fix:
@@ -139,29 +63,41 @@ function AutoRotation_Process($filename, $format, $preferred_format = 0, $orient
 		return false;
 		
 	// Rotate and/or flip the image so that it is correct:
+	$success = true;
 	if ($orientation == 2)		// -> Flipped horizontally
-		$src_img = imageflip($src_img, IMG_FLIP_HORIZONTAL);
-	elseif ($orientation == 3)	// -> Rotated 180 degrees
+		$success = imageflip($src_img, IMG_FLIP_HORIZONTAL);
+	elseif ($orientation == 3)	// -> Rotated 180 degrees clockwise
 		$src_img = imagerotate($src_img, 180, 0);
 	elseif ($orientation == 4)	// -> Flipped vertically
-		$src_img = imageflip($src_img, IMG_FLIP_VERTICAL);
-	elseif ($orientation == 5)	// -> Rotated 90 degrees counterclockwise, then flipped vertically
-		$src_img = imagerotate(imageflip($src_img, IMG_FLIP_VERTICAL), -90, 0);
+		$success = imageflip($src_img, IMG_FLIP_VERTICAL);
+	elseif ($orientation == 5)	// -> Flipped vertically, then rotated 90 degrees counterclockwise
+	{
+		if ($success = imageflip($src_img, IMG_FLIP_VERTICAL))
+			$src_img = imagerotate($src_img, -90, 0);
+	}
 	elseif ($orientation == 6)	// -> Rotated 90 degrees counterclockwise
 		$src_img = imagerotate($src_img, -90, 0);
 	elseif ($orientation == 7)	// -> Flipped horizontally, then rotated 90 degrees counterclockwise
-		$src_img = imagerotate(imageflip($src_img, IMG_FLIP_HORIZONTAL), -90, 0);
+	{
+		if ($success = imageflip($src_img, IMG_FLIP_HORIZONTAL))
+			$src_img = imagerotate($src_img, -90, 0);
+	}
 	elseif ($orientation == 8)	// -> Rotated 90 degrees clockwise
 		$src_img = imagerotate($src_img, 90, 0);
 
-	// Save the image as...
-	if (!empty($preferred_format) &&($preferred_format == 3) && function_exists('imagepng'))
-		$success = imagepng($src_img, $filename);
-	elseif (!empty($preferred_format) &&($preferred_format == 1) && function_exists('imagegif'))
-		$success = imagegif ($src_img, $filename);
-	elseif (function_exists('imagejpeg'))
-		$success = imagejpeg($src_img, $filename);
-	imagedestroy($src_img);
+	// Make sure that we are still dealing with an image in memory!
+	if (!empty($success) && is_resource($src_img))
+	{
+		// Save the image as...
+		if (!empty($preferred_format) && ($preferred_format == 3) && function_exists('imagepng'))
+			$success = imagepng($src_img, $filename);
+		elseif (!empty($preferred_format) && ($preferred_format == 1) && function_exists('imagegif'))
+			$success = imagegif($src_img, $filename);
+		elseif (function_exists('imagejpeg'))
+			$success = imagejpeg($src_img, $filename);
+	}
+	if (is_resource($src_img))
+		imagedestroy($src_img);
 	return ($success ? $orientation : false);
 }
 
@@ -180,8 +116,8 @@ function AutoRotation_Download($img_name, $img_ext, $id_thumb, $img_type)
 		$request = $smcFunc['db_query']('', '
 			SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type
 			FROM {db_prefix}attachments AS a
-				INNER JOIN {db_prefix}attachments AS thumb ON(a.id_thumb = thumb.id_attach)
-			WHERE a.id_attach = {int:thumbnail}
+				INNER JOIN {db_prefix}attachments AS thumb ON (a.id_thumb = thumb.id_attach)
+			WHERE thumb.id_attach = {int:thumbnail}
 			LIMIT 1',
 			array(
 				'thumbnail' => $id_thumb,
@@ -229,7 +165,7 @@ function AutoRotation_Update($id_attach, $width, $height, $orientation = 1)
 		WHERE id_attach = {int:id_attach}',
 		array(
 			'id_attach' => (int) $id_attach,
-			'rotated' => (int) $orientation,
+			'rotated' => max(1, (int) $orientation),
 			'width' => (int) $width,
 			'height' => (int) $height
 		)
@@ -274,10 +210,157 @@ function AutoRotation_Display($row)
 			$size = @getimagesize($attachment);
 			AutoRotation_Update($id_attach, $row['thumb_width'] = $size[0], $row['thumb_height'] = $size[1], $orientation);
 		}
+		$smcFunc['db_free_result']($request);
 	}
 
 	// Return all this information back to the caller:
 	return $row;
+}
+
+//==============================================================================
+// This replacement "imageflip" function gets used when using PHP < 5.5.
+//==============================================================================
+// Credit: Daniel Klein => http://php.net/manual/en/function.imageflip.php#118774
+//==============================================================================
+if (!function_exists('imageflip')) 
+{
+	function imageflip($image, $mode) 
+	{
+		if ($mode == IMG_FLIP_HORIZONTAL)
+		{
+			$max_x = imagesx($image) - 1;
+			$half_x = $max_x / 2;
+			$sy = imagesy($image);
+			$temp_image = imageistruecolor($image) ? imagecreatetruecolor(1, $sy) : imagecreate(1, $sy);
+			for ($x = 0; $x < $half_x; ++$x) 
+			{
+				imagecopy($temp_image, $image, 0, 0, $x, 0, 1, $sy);
+				imagecopy($image, $image, $x, 0, $max_x - $x, 0, 1, $sy);
+				imagecopy($image, $temp_image, $max_x - $x, 0, 0, 0, 1, $sy);
+			}
+		}
+		elseif ($mode == IMG_FLIP_VERTICAL)
+		{
+			$sx = imagesx($image);
+			$max_y = imagesy($image) - 1;
+			$half_y = $max_y / 2;
+			$temp_image = imageistruecolor($image) ? imagecreatetruecolor($sx, 1) : imagecreate($sx, 1);
+			for ($y = 0; $y < $half_y; ++$y) 
+			{
+				imagecopy($temp_image, $image, 0, 0, 0, $y, $sx, 1);
+				imagecopy($image, $image, 0, $y, 0, $max_y - $y, $sx, 1);
+				imagecopy($image, $temp_image, 0, $max_y - $y, 0, 0, $sx, 1);
+			}
+		}
+		elseif ($mode == IMG_FLIP_BOTH)
+		{
+			$sx = imagesx($image);
+			$sy = imagesy($image);
+			$temp_image = imagerotate($image, 180, 0);
+			imagecopy($image, $temp_image, 0, 0, 0, 0, $sx, $sy);
+		}
+		else
+			return false;
+
+		imagedestroy($temp_image);
+		return true;
+	}
+}
+
+//==============================================================================
+// This replacement "imagerotate" function gets used when using PHP < 4.3.
+// NOTE: Parameters "bgd_color" and "ignore_transparent" are completely ignored!
+//==============================================================================
+// Credit: Ajenbo => http://php.net/manual/en/function.imagerotate.php#85329
+//==============================================================================
+if (!function_exists('imagerotate'))
+{
+	function imagerotate($image, $angle, $bgd_color = NULL, $ignore_transparent = NULL)
+	{
+		if ($angle == 180)
+			return imagerotate(imagerotate($image, 90), 90);
+		if ($angle != 270 && $angle != 90)
+			return $image;
+		$width = imagesx($image);
+		$height = imagesy($image);
+		$side = $width > $height ? $width : $height;
+		$imageSquare = imagecreatetruecolor($side, $side);
+		imagecopy($imageSquare, $image, 0, 0, 0, 0, $width, $height);
+		imagedestroy($image);
+		$imageSquare = imagerotate($imageSquare, $angle, 0, -1);
+		$image = imagecreatetruecolor($height, $width);
+		$x = $angle == 90 ? 0 : ($height > $width ? 0 : ($side - $height));
+		$y = $angle == 270 ? 0 : ($height < $width ? 0 : ($side - $width));
+		imagecopy($image, $imageSquare, 0, 0, $x, $y, $height, $width);
+		imagedestroy($imageSquare);
+		return $image;	
+	}
+}
+
+//==============================================================================
+// Admin functions for dealing with image rotation
+//==============================================================================
+function AutoRotation_RemoveHook(&$subActions)
+{
+	global $context;
+	$context['autorotation_hook'] = $subActions['remove'];
+	$subActions['remove'] = 'AutoRotation_Rotate';
+}
+
+function AutoRotation_Rotate()
+{
+	global $smcFunc, $context;
+
+	// First, let's make sure that the session is valid!!!
+	checkSession('post');
+
+	// Start any user-requested image processing....
+	if (!empty($_POST['orient']))
+	{
+		// Sanitize the inputs before we pass it to the database:
+		$tmp = array();
+		foreach ($_POST['orient'] as $msg => $orient)
+			$tmp[(int) $msg] = (int) $orient;
+
+		// This is a thumbnail!  Drats...  Gotta find the original and process it, too.... :(
+		$request = $smcFunc['db_query']('', '
+			SELECT 
+				a.id_attach, a.id_folder, a.file_hash, t.id_attach AS thumb_id, a.filename, 
+				a.fileext, t.id_folder AS thumb_folder, t.file_hash AS thumb_hash, 
+				t.fileext as thumb_ext, t.filename AS thumb_name
+			FROM {db_prefix}attachments AS a
+				LEFT JOIN {db_prefix}attachments AS t ON (t.id_attach = a.id_thumb)
+			WHERE a.id_attach IN ({array_int:message_list})',
+			array(
+				'message_list' => array_keys($tmp),
+			)
+		);
+		while ($row = $smcFunc['db_fetch_assoc']($request))
+		{
+			// Process main attachment image:
+			$format = ($row['fileext'] == 'png' ? 3 : ($row['fileext'] == 'gif' ? 1 : 0));
+			$img = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
+			$orientation = AutoRotation_Process($img, $row['fileext'], $format, $tmp[$row['id_attach']]);
+			$size = @getimagesize($img);
+			AutoRotation_Update($row['id_attach'], $size[0], $size[1], $orientation);
+
+			// Also process the thumbnail (if available):
+			if (!empty($row['thumb_id']))
+			{
+				$format = ($row['thumb_ext'] == 'png' ? 3 : ($row['thumb_ext'] == 'gif' ? 1 : 0));
+				$img = getAttachmentFilename($row['thumb_name'], $row['thumb_attach'], $row['thumb_folder'], false, $row['thumb_hash']);
+				$orientation = AutoRotation_Process($img, $row['thumb_ext'], $format, $tmp[$row['thumb_id']]);
+				$size = @getimagesize($img);
+				AutoRotation_Update($row['thumb_attach'], $size[0], $size[1], $orientation);
+			}
+		}
+	}
+
+	// Since we're chain-calling stuff, this MUST be called after processing the images!!!
+	if (!empty($context['autorotation_hook']))
+		$context['autorotation_hook']();
+	else
+		RemoveAttachment();
 }
 
 ?>
