@@ -519,11 +519,15 @@ function AutoRotation_Inbound($index, $pm = false)
 		// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
 		// or attachment image width/height values are set and it's too wide/high,
 		// or it's not a BMP image and it's too large ...
-		if ($type == 6 || ($type != 2 && $modSettings[$pre . 'attachment_image_reformat']) || ($modSettings[$pre . 'attachment_image_width'] > 0 && $width > $modSettings[$pre . 'attachment_image_width']) || ($modSettings[$pre . 'attachment_image_height'] > 0 && $height > $modSettings[$pre . 'attachment_image_height']) || ($type != 6 && $_FILES['attachment']['size'][$index] > $modSettings['pmAttachmentSizeLimit'] * 1024))
+		$sizeLimit = !empty(($modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) ? $modSettings[($pm ? 'A' : 'a') . 'ttachmentSizeLimit'] * 1024 : 0;
+		if ($type == 6 || ($type != 2 && !empty($modSettings[$pre . 'attachment_image_reformat']))
+			|| (!empty($modSettings[$pre . 'attachment_image_width']) && $width > $modSettings[$pre . 'attachment_image_width'])
+			|| (!empty($modSettings[$pre . 'attachment_image_height']) && $height > $modSettings[$pre . 'attachment_image_height'])
+			|| ($type != 6 && !empty($sizeLimit) && $_FILES['attachment']['size'][$index] > $sizeLimit))
 		{
 			// What size should this image be?
-			$width = $modSettings[$pre . 'attachment_image_width'] == 0 ? $width : min($width, $modSettings[$pre . 'attachment_image_width']);
-			$height = $modSettings[$pre . 'attachment_image_height'] == 0 ? $height : min($height, $modSettings[$pre . 'attachment_image_height']);
+			$width = empty($modSettings[$pre . 'attachment_image_width'])? $width : min($width, $modSettings[$pre . 'attachment_image_width']);
+			$height = empty($modSettings[$pre . 'attachment_image_height']) ? $height : min($height, $modSettings[$pre . 'attachment_image_height']);
 
 			// Resize the image (and rotate it if necessary).
 			require_once($sourcedir . '/Subs-Graphics.php');
@@ -569,7 +573,7 @@ function AutoRotation_Inbound($index, $pm = false)
 				$_FILES['attachment']['size'][$index] = filesize($_FILES['attachment']['tmp_name'][$index]);
 
 				// Change the file suffix to 'jpg' if necessary.
-				if (true && $modSettings[$pre . 'attachment_image_reformat'] && strrchr($_FILES['attachment']['name'][$index], '.') != '.jpg')
+				if (!empty($modSettings[$pre . 'attachment_image_reformat']) && strrchr($_FILES['attachment']['name'][$index], '.') != '.jpg')
 					$_FILES['attachment']['name'][$index] = substr($_FILES['attachment']['name'][$index], 0, -(strlen(strrchr($_FILES['attachment']['name'][$index], '.')))) . '.jpg';
 			}
 		}

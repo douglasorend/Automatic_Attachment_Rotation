@@ -1,3 +1,7 @@
+v4.1 - March 30th, 2018
+o Changed some code to avoid undefined array element errors.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], added check to see if file size is greater than 0.
+
 v4.0 - March 27th, 2018
 o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], fixed issue where images with very large dimensions could not be rotated ([url=http://custom.simplemachines.org/mods/index.php?mod=4111]Image Processing Memory Limit[/url] mod may also be required if issue persists).
 o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], code added to automatically resize images in new and existing topics.

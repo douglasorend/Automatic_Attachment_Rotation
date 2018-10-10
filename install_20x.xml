@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation (and Resize)</name>
-<version>4.0</version>
+<version>4.1</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -88,7 +88,11 @@
 				// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
 				// or attachment image width/height values are set and it's too wide/high,
 				// or it's not a BMP image and it's too large ...
-				if ($type == 6 || ($type != 2 && $modSettings['attachment_image_reformat']) || ($modSettings['attachment_image_width'] > 0 && $width > $modSettings['attachment_image_width']) || ($modSettings['attachment_image_height'] > 0 && $height > $modSettings['attachment_image_height']) || ($type != 6 && $attachmentData[$i]['size'] > $modSettings['attachmentSizeLimit']*1024))
+				$sizeLimit = !empty($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0;
+				if ($type == 6 || ($type != 2 && !empty($modSettings[$pre . 'attachment_image_reformat']))
+					|| (!empty($modSettings[$pre . 'attachment_image_width']) && $width > $modSettings[$pre . 'attachment_image_width'])
+					|| (!empty($modSettings[$pre . 'attachment_image_height']) && $height > $modSettings[$pre . 'attachment_image_height'])
+					|| ($type != 6 && !empty($sizeLimit) && $_FILES['attachment']['size'][$index] > $sizeLimit))
 				{
 					// What size will we make this image?
 					$width = empty($modSettings['attachment_image_width']) ? $width : min($width, $modSettings['attachment_image_width']);
