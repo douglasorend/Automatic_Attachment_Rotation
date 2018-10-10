@@ -9,6 +9,7 @@
 * WITHOUT ANY WARRANTIES; without even any implied warranty of MERCHANTABILITY	  *
 * or FITNESS FOR A PARTICULAR PURPOSE.											  *
 **********************************************************************************/
+global $helptxt;
 
 $txt['img_rotate_confirm'] = 'Are you sure you want to apply the image rotate/flip changes?';
 $txt['img_orientation'] = 'Rotate/Flip';
@@ -28,16 +29,17 @@ $txt['AutoRotation_log_error'] = 'Log memory error while Rotating image?';
 $txt['AutoRotation_memory_issue'] = 'Unable to allocate %1$d of memory for image rotation.';
 
 // Added for Automatic Attachment Rotation (and Resize).
-$txt['attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG.';
+$txt['attachment_auto_rotate'] = 'Automatically rotate images<div class="smalltext">(Only possible for JPEG images containing EXIF orientation data)</div>';
+$txt['attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG';
 $txt['attachment_resize_existing'] = 'Resize existing images';
 $txt['attachment_jpeg_quality'] = 'JPEG quality factor<div class="smalltext">(Maximum 100, default 100)</div>';
-$txt['attachment_image_width'] = 'Maximum width of attached images.<div class="smalltext">(0 for no maximum width)</div>';
-$txt['attachment_image_height'] = 'Maximum height of attached images.<div class="smalltext">(0 for no maximum height)</div>';
+$txt['attachment_image_width'] = 'Maximum width of attached images<div class="smalltext">(0 for no maximum width)</div>';
+$txt['attachment_image_height'] = 'Maximum height of attached images<div class="smalltext">(0 for no maximum height)</div>';
 
-$txt['pm_attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG.';
+$txt['pm_attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG';
 $txt['pm_attachment_jpeg_quality'] = 'JPEG quality factor<div class="smalltext">(Maximum 100, default 100)</div>';
-$txt['pm_attachment_image_width'] = 'Maximum width of attached images.<div class="smalltext">(0 for no maximum width)</div>';
-$txt['pm_attachment_image_height'] = 'Maximum height of attached images.<div class="smalltext">(0 for no maximum height)</div>';
+$txt['pm_attachment_image_width'] = 'Maximum width of attached images<div class="smalltext">(0 for no maximum width)</div>';
+$txt['pm_attachment_image_height'] = 'Maximum height of attached images<div class="smalltext">(0 for no maximum height)</div>';
 
 $helptxt['attachment_image_reformat'] = 'Selecting this option will reformat non-JPEG images as JPEG';
 $helptxt['attachment_resize_existing'] = 'Selecting this option will resize any existing images which are larger than the set dimensions for attached images.';

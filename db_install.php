@@ -11,9 +11,9 @@ require($sourcedir.'/Subs-Admin.php');
 db_extend('packages');
 
 //==============================================================================
-// Insert one column into the necessary tables:
+// Insert two columns into attachments tables:
 //==============================================================================
-// {prefix}boards table gets a new column to hold the number of anonymous posts:
+// {prefix}attachments table gets two new columns to hold image orientation and JPEG quality:
 $smcFunc['db_add_column'](
 	'{db_prefix}attachments', 
 	array(
@@ -24,6 +24,16 @@ $smcFunc['db_add_column'](
 		'default' => 0
 	)
 );
+$smcFunc['db_add_column'](
+	'{db_prefix}attachments', 
+	array(
+		'name' => 'jpeg_quality', 
+		'size' => 3, 
+		'type' => 'tinyint', 
+		'null' => false, 
+		'default' => 100
+	)
+);
 
 //==============================================================================
 // Add resize options to the settings table
@@ -32,6 +42,7 @@ $smcFunc['db_insert']('ignore',
 	'{db_prefix}settings',
 	array('variable' => 'string', 'value' => 'int'),
 	array(
+		array('attachment_auto_rotate', '1'),
 		array('attachment_image_reformat', '0'),
 		array('attachment_resize_existing', '0'),
 		array('attachment_jpeg_quality', '100'),

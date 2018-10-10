@@ -1,5 +1,5 @@
 [hr]
-[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v4.3[/b][/size][/color]
+[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v4.4[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4087]Link to Mod[/url]
 [/center]
 [hr]
@@ -7,11 +7,12 @@
 [color=blue][b][size=12pt][u]Introduction[/u][/size][/b][/color]
 This mod allows the automatic rotation and/or flipping of images [b]ONLY IF[/b] the EXIF information contained within (if such exists) indicates that such processing is required in order to show the picture upright.
 
-Features for automatic image resizing:
- - Option to reformat non-JPEG images to JPEG in topics and PMs;
- - Option to resize existing images in topics;
- - Option to set the JPEG quality factor in topics and PMs; and
- - Option to set max width and height values for attached images that are different to values for posted images in topics and PMs.
+Features for automatic image resizing for both posts and PMs:
+o Option to disable automatic image rotation
+o Option to disable automatic resizing of existing images
+o Option to reformat non-JPEG images to JPEG
+o Option to set max width and height values for attached images
+o Option to set the JPEG quality factor
 
 [b]NOTE:[/b] SMF contains an option called [b]Re-encode potentially dangerous image attachments[/b], which is turned on by default.  This re-encoding removes the orientation information from attachments (amongst other things), which means that attachments uploaded prior to this mod being installed will [b]NOT[/b] be able to rotated properly, as the EXIF information is missing from the re-encoded attachment file!
 
@@ -53,7 +54,7 @@ Test images with EXIF orientation values embedded in them are available at [url=
 The changelog has been removed and can be seen at [url=http://www.xptsp.com/board/index.php?topic=662.msg975#msg975]XPtsp.com[/url].
 
 [color=blue][b][size=12pt][u]License[/u][/size][/b][/color]
-[quote]Copyright (c) 2016 - 2017, Douglas Orend
+[quote]Copyright (c) 2016 - 2018, Douglas Orend
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

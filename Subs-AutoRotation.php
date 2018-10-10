@@ -494,6 +494,10 @@ function AutoRotation_Inbound($index, $pm = false)
 {
 	global $modSettings, $sourcedir;
 
+	// Does this index actually exist?  If not, return to caller:
+	if (!isset($_FILES['attachment']['tmp_name'][$index]))
+		return;
+
 	// Figure some things out:
 	$pre = $pm ? 'pm_' : '';
 	$filename = $_FILES['attachment']['tmp_name'][$index];
@@ -501,7 +505,7 @@ function AutoRotation_Inbound($index, $pm = false)
 	$jpegQuality = min(100, empty($modSettings[$pre . 'attachment_jpeg_quality']) ? 100 : $modSettings[$pre . 'attachment_jpeg_quality']);
 	$imageRotated = false;
 
-	// Find out image mime type.
+	// Find out image mime.
 	$imageSize = @getimagesize($filename);
 
 	// If it's a JPEG image rotate it if necessary.
@@ -545,18 +549,23 @@ function AutoRotation_Inbound($index, $pm = false)
 	// Resize/reformat image and rotate it if necessary.
 	if (list ($width, $height, $type) = @getimagesize($filename))
 	{
-		if (AutoRotation_Aspect($width, $height, $pre))
+		if ((AutoRotation_Aspect($width, $height, $pre) || empty($sizeLimit)))
 		{
+			if (!empty($modSettings[$pre . 'attachment_image_reformat']))
+				$preferred_format = 2;
+			else
+				$preferred_format = $type;
+
 			// Resize the image (and rotate it if necessary).
 			require_once($sourcedir . '/Subs-Graphics.php');
-			if (resizeImageFile($filename, $filename . '.temp', $width, $height, '', $jpegQuality))
+			if (resizeImageFile($filename, $filename . '.temp', $width, $height, $preferred_format, $jpegQuality))
 			{
 				// Delete the old tmp file and rename the new one.
 				unlink($filename);
 				rename($filename . '.temp', $filename);
 
 				// If it's a JPEG image rotate and/or compress the image.
-				if ($imageSize['mime'] == 'image/jpeg' && !$imageRotated)
+				if (($imageSize['mime'] == 'image/jpeg' && !$imageRotated) || !empty($modSettings[$pre . 'attachment_image_reformat']))
 				{
 					// Disable image reencoding to enable image rotation.
 					$modSettings['attachment_image_reencode'] = false;
@@ -594,6 +603,10 @@ function AutoRotation_Inbound($index, $pm = false)
 				$filename = $_FILES['attachment']['name'][$index];
 				if (!empty($modSettings[$pre . 'attachment_image_reformat']) && strrchr($filename, '.') != '.jpg')
 					$filename = substr($filename, 0, -(strlen(strrchr($filename, '.')))) . '.jpg';
+
+				// Find out image mime type.
+				$filename = $_FILES['attachment']['tmp_name'][$index];
+				$imageSize = @getimagesize($filename);
 			}
 		}
 	}

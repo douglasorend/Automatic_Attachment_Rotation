@@ -1,3 +1,11 @@
+v4.4 - April 7th, 2018
+o SMF 2.0: Fixed XML installer error concerning JPEG quality size.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], added JPEQ quality check to prevent unnecessary image resizing.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], fixed code to prevent converting to JPEG when admin option unchecked.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], added option to disable automatic image rotation.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], added option to disable automatic image resizing.
+o Fixed a few possible undefined index array errors.
+
 v4.3 - April 5th, 2018
 o Fixed code to avoid distorting aspect ratio of resized pictures.
 o Added code to avoid resizing images if they are under/at admin-set dimensions.
