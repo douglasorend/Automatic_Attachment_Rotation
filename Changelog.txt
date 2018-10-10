@@ -1,3 +1,6 @@
+v2.3 - September 26th, 2016
+o Added code to include timestamps on attachment URLs to circumvent browser caching.
+
 v2.2 - September 20th, 2016
 o Fixed syntax error found in [b]Subs-AutoRotation.php[/b].  Thanks, [url=http://www.simplemachines.org/community/index.php?action=profile;u=387324]kungfujoe[/url]!
 o Fixed issue in the attachment screen, where attachment IDs were not being sent correctly.

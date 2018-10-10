@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>2.2</version>
+<version>2.3</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -52,6 +52,22 @@
 	if (!$proper_rotation && (isset($_REQUEST['type']) && $_REQUEST['type'] != 'avatar'))
 		AutoRotation_Download($filename, $file_ext, $_REQUEST['attach'], $attachment_type);]]></add>
 	</operation>
+	
+	<!-- loadAttachmentContext function -->
+	<operation>
+		<search position="after"><![CDATA[$attachmentData[$i] = array(]]></search>
+		<add><![CDATA[$time = filemtime(getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']));
+
+			]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach']]]></search>
+		<add><![CDATA[ . ';ts=' . $time]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA['link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'] . ']]></search>
+		<add><![CDATA[;ts=' . $time . ']]></add>
+	</operation>
 </file>
 <file name="$sourcedir/ManageAttachments.php">
 	<!-- ManageAttachments function -->
@@ -61,6 +77,13 @@
 	</operation>
 	
 	<!-- BrowseFiles function -->
+	<operation>
+		<search position="replace"><![CDATA[	$link .= sprintf(\'%1$s?action=dlattach;topic=%2$d.0;attach=%3$d\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_attach\']);]]></search>
+		<add><![CDATA[{
+							$time = filemtime(getAttachmentFilename($rowData[\'filename\'], $rowData[\'id_attach\'], $rowData[\'id_folder\'], false, $rowData[\'file_hash\']));
+							$link .= sprintf(\'%1$s?action=dlattach;topic=%2$d.0;attach=%3$d;ts=%4$d\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_attach\'], $time);
+						}]]></add>
+	</operation>
 	<operation>
 		<search position="after"><![CDATA['check' => array(]]></search>
 		<add><![CDATA['orientation' => array(
@@ -87,6 +110,12 @@
 	<operation>
 		<search position="after"><![CDATA[$txt['quickmod_delete_selected'] . ]]></search>
 		<add><![CDATA[$txt['img_rotate'] . ' &amp; ' . ]]></add>
+	</operation>
+
+	<!-- list_getFiles function -->
+	<operation>
+		<search position="after"><![CDATA[a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board]]></search>
+		<add><![CDATA[a.id_folder, ]]></add>
 	</operation>
 </file>
 <file name="$sourcedir/Subs-Graphics.php">
