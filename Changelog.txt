@@ -1,3 +1,6 @@
+v3.8 - October 9th, 2017
+o Fixed syntax error in code that builds the attachment link.
+
 v3.7.1 - September 12th, 2017
 o SMF 2.0: Fixed a syntax typo in [b]Sources/Display.php[/b]
 o SMF 2.1: Fixed a syntax typo in [b]Sources/Subs-Attachments.php[/b]

@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>3.7.1</version>
+<version>3.8</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -152,7 +152,7 @@
 	</operation>
 	<operation>
 		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach]]></search>
-		<add><![CDATA[ . ';ts=' . $time . ']]></add>
+		<add><![CDATA[;ts=' . $time . ']]></add>
 	</operation>
 	<operation>
 		<search position="before"><![CDATA['link' => '<a href="' . $scripturl . '?action=dlattach]]></search>
