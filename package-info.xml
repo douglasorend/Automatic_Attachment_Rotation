@@ -5,7 +5,7 @@
 	<id>Dougiefresh:AutoRotation</id>
 	<name>Automatic Attachment Rotation (and Resize)</name>
 	<type>modification</type>
-	<version>4.6</version>
+	<version>4.7</version>
 
 	<install for="2.0 - 2.0.99">
 		<readme parsebbc="true">readme.txt</readme>
@@ -14,8 +14,10 @@
 		<modification>install_20x.xml</modification>
 		<require-file name="Class-exifReader.php" destination="$sourcedir" />
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
+		<require-file name="AutoRotation.dutch.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.dutch-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.english.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="AutoRotation.english-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<redirect url="?action=admin;area=manageattachments;sa=attachments">redirect.txt</redirect> 
@@ -25,8 +27,10 @@
 		<modification reverse="true">install_20x.xml</modification>
 		<remove-file name="$sourcedir/Class-exifReader.php" />		
 		<remove-file name="$sourcedir/Subs-AutoRotation.php" />		
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english.php" />
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin-utf8.php" />
 	</uninstall>
@@ -38,8 +42,10 @@
 		<modification>install_21x.xml</modification>
 		<require-file name="Class-exifReader.php" destination="$sourcedir" />
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
+		<require-file name="AutoRotation.dutch.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.dutch-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.english.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="AutoRotation.english-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<redirect url="?action=admin;area=manageattachments;sa=attachments">redirect.txt</redirect> 
@@ -49,8 +55,10 @@
 		<modification reverse="true">install_21x.xml</modification>
 		<remove-file name="$sourcedir/Class-exifReader.php" />		
 		<remove-file name="$sourcedir/Subs-AutoRotation.php" />		
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english.php" />
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin-utf8.php" />
 	</uninstall>

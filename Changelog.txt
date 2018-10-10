@@ -1,3 +1,9 @@
+v4.7 - April 12th, 2018
+o Updated Dutch translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=287786]@rjen[/url]
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3968843#msg3968843]@rjen[/url] fixed issue where attachment is deleted if checkbox is selected and [i]Rotate/Flip Images[/i] button is clicked.
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3968843#msg3968843]@rjen[/url] included English UTF8 language file.
+o Some code tidy-up in ./Sources/Display.php for JPEG Quailty processing.
+
 v4.6 - April 8th, 2018
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3968596#msg3968596]@rjen's post[/url] fixed installation error in ./Sources/Post.php.
 o Moved test for disabled automatic image rotation from ./Sourecs/Post.php to ./Sources/Subs-AutoRotation.php so that image resizing still occurs.

@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation (and Resize)</name>
-<version>4.6</version>
+<version>4.7</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -262,7 +262,17 @@
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
-						$str = sprintf(\'<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option></select>\', $rowData[\'id_attach\']);
+						$str = sprintf(\'<select id="orient[%1$d]" name="orient[%1$d]">
+											<option value="0">' . $txt['img_orientation1'] . '</option>
+											<option value="6">' . $txt['img_orientation6'] . '</option>
+											<option value="8">' . $txt['img_orientation8'] . '</option>
+											<option value="3">' . $txt['img_orientation3'] . '</option>
+											<option value="2">' . $txt['img_orientation2'] . '</option>
+											<option value="4">' . $txt['img_orientation4'] . '</option>
+											<option value="7">' . $txt['img_orientation7'] . '</option>
+											<option value="5">' . $txt['img_orientation5'] . '</option>
+										</select>\',
+								$rowData[\'id_attach\']);
 						return !empty($rowData[\'width\']) && !empty($rowData[\'height\']) ? $str : false;
 					'),
 					'style' => 'text-align: center',
@@ -272,7 +282,7 @@
 	</operation>
 	<operation>	<!-- line 473 -->
 		<search position="after"><![CDATA[name="remove_submit"]]></search>
-		<add><![CDATA[$txt[name="rotate_submit" class="button_submit" value="' . $txt['img_rotate'] . '" onclick="return confirm(\'' . $txt['img_rotate_confirm'] . '\');" />
+		<add><![CDATA[name="rotate_submit" class="button_submit" value="' . $txt['img_rotate'] . '" onclick="return confirm(\'' . $txt['img_rotate_confirm'] . '\');" />
 							<input type="submit" ]]></add>
 	</operation>
 	<operation>	<!-- line 479 -->
@@ -286,6 +296,12 @@
 	<operation>	<!-- line 513 -->
 		<search position="after"><![CDATA[a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board]]></search>
 		<add><![CDATA[a.id_folder, ]]></add>
+	</operation>
+
+	<!-- RemoveAttachment function -->
+	<operation>	<!-- line 768 -->
+		<search position="before"><![CDATA[if (!empty($_POST['remove'])]]></search>
+		<add><![CDATA[ && isset($_POST['remove_submit'])]]></add>
 	</operation>
 </file>
 <file name="$sourcedir/PersonalMessage.php">

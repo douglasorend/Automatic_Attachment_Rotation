@@ -603,7 +603,7 @@ function AutoRotation_Inbound($index, $pm = false)
 
 				// Change the file suffix to 'jpg' if necessary.
 				$filename = $_FILES['attachment']['name'][$index];
-				if ($preferred_format = 2 && strrchr($filename, '.') != '.jpg')
+				if ($preferred_format == 2 && strrchr($filename, '.') != '.jpg')
 					$_FILES['attachment']['name'][$index] = substr($filename, 0, -(strlen(strrchr($filename, '.')))) . '.jpg';
 			}
 		}
