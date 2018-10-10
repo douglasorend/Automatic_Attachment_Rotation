@@ -3,9 +3,9 @@
 
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>Dougiefresh:AutoRotation</id>
-	<name>Automatic Attachment Rotation</name>
+	<name>Automatic Attachment Rotation (and Resize)</name>
 	<type>modification</type>
-	<version>3.12</version>
+	<version>4.0</version>
 
 	<install for="2.0 - 2.0.99">
 		<readme parsebbc="true">readme.txt</readme>

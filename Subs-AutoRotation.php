@@ -370,6 +370,11 @@ if (!function_exists('imagerotate'))
 //==============================================================================
 // Admin functions for dealing with image rotation
 //==============================================================================
+function AutoRotation_LoadHelp()
+{
+	loadLanguage('AutoRotation');
+}
+
 function AutoRotation_AdminHook(&$subActions)
 {
 	global $context;
@@ -459,6 +464,116 @@ function AutoRotation_Clear()
 		)
 	);
 	redirectexit('action=admin;area=manageattachments;sa=maintenance;' . $context['session_var'] . '=' . $context['session_id']);
+}
+
+//==============================================================================
+// Image Resizing functionality added by GL700Wing:
+//==============================================================================
+function AutoRotation_Inbound($index, $pm = false)
+{
+	global $modSettings, $sourcedir;
+
+	// Find out image mime type.
+	$imageSize = @getimagesize($_FILES['attachment']['tmp_name'][$index]);
+
+	// If it's a JPEG image rotate it if necessary.
+	$pre = $pm ? 'pm_' : '';
+	if ($imageSize['mime'] == 'image/jpeg')
+	{
+		// Disable image reencoding to enable image rotation.
+		$modSettings['attachment_image_reencode'] = false;
+
+		@ini_set('gd.jpeg_ignore_warning', 1);
+		$image = @imagecreatefromjpeg($_FILES['attachment']['tmp_name'][$index]);
+
+		// Rotate JPEG image according to Exif orientation.
+		$imageExif = @exif_read_data($_FILES['attachment']['tmp_name'][$index]);
+		if (array_key_exists('Orientation', $imageExif))
+		{
+			if ($_FILES['attachment']['size'][$index] <= $modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit'] * 1024)
+			{
+				$imageOrientation = $imageExif['Orientation'];
+				switch($imageOrientation)
+				{
+					case 3:
+						$image = imagerotate($image, 180, 0);
+						break;
+					case 6:
+						$image = imagerotate($image, -90, 0);
+						break;
+					case 8:
+						$image = imagerotate($image, 90, 0);
+						break;
+				}
+			}
+		}
+
+		// Create the JPEG file with maximum quality of 100%.
+		imagejpeg($image, $_FILES['attachment']['tmp_name'][$index], min($modSettings[$pre . 'attachment_jpeg_quality'], 100));
+		imagedestroy($image);
+	}
+
+	// Resize/reformat image and rotate it if necessary.
+	if (list ($width, $height, $type) = @getimagesize($_FILES['attachment']['tmp_name'][$index]))
+	{
+		// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
+		// or attachment image width/height values are set and it's too wide/high,
+		// or it's not a BMP image and it's too large ...
+		if ($type == 6 || ($type != 2 && $modSettings[$pre . 'attachment_image_reformat']) || ($modSettings[$pre . 'attachment_image_width'] > 0 && $width > $modSettings[$pre . 'attachment_image_width']) || ($modSettings[$pre . 'attachment_image_height'] > 0 && $height > $modSettings[$pre . 'attachment_image_height']) || ($type != 6 && $_FILES['attachment']['size'][$index] > $modSettings['pmAttachmentSizeLimit'] * 1024))
+		{
+			// What size should this image be?
+			$width = $modSettings[$pre . 'attachment_image_width'] == 0 ? $width : min($width, $modSettings[$pre . 'attachment_image_width']);
+			$height = $modSettings[$pre . 'attachment_image_height'] == 0 ? $height : min($height, $modSettings[$pre . 'attachment_image_height']);
+
+			// Resize the image (and rotate it if necessary).
+			require_once($sourcedir . '/Subs-Graphics.php');
+			if (resizeImageFile($_FILES['attachment']['tmp_name'][$index], $_FILES['attachment']['tmp_name'][$index] . '.temp', $width, $height))
+			{
+				// Delete the old tmp file and rename the new one.
+				unlink($_FILES['attachment']['tmp_name'][$index]);
+				rename($_FILES['attachment']['tmp_name'][$index] . '.temp', $_FILES['attachment']['tmp_name'][$index]);
+
+				// If it's a JPEG image rotate and/or compress the image.
+				if ($imageSize['mime'] == 'image/jpeg')
+				{
+					// Disable image reencoding to enable image rotation.
+					$modSettings['attachment_image_reencode'] = false;
+
+					@ini_set ('gd.jpeg_ignore_warning', 1);
+					$image = @imagecreatefromjpeg($_FILES['attachment']['tmp_name'][$index]);
+
+					// Rotate JPEG image according to Exif orientation.
+					if (array_key_exists('Orientation', $imageExif))
+					{
+						$imageOrientation = $imageExif['Orientation'];
+						switch($imageOrientation)
+						{
+							case 3:
+								$image = imagerotate($image, 180, 0);
+								break;
+							case 6:
+								$image = imagerotate($image, -90, 0);
+								break;
+							case 8:
+								$image = imagerotate($image, 90, 0);
+								break;
+						}
+					}
+
+					// Create the JPEG file with maximum quality of 100%.
+					imagejpeg($image, $_FILES['attachment']['tmp_name'][$index], min($modSettings[$pre . 'attachment_jpeg_quality'], 100));
+					imagedestroy($image);
+				}
+
+				// Recheck the file size
+				$_FILES['attachment']['size'][$index] = filesize($_FILES['attachment']['tmp_name'][$index]);
+
+				// Change the file suffix to 'jpg' if necessary.
+				if (true && $modSettings[$pre . 'attachment_image_reformat'] && strrchr($_FILES['attachment']['name'][$index], '.') != '.jpg')
+					$_FILES['attachment']['name'][$index] = substr($_FILES['attachment']['name'][$index], 0, -(strlen(strrchr($_FILES['attachment']['name'][$index], '.')))) . '.jpg';
+			}
+		}
+	}
 }
 
 ?>

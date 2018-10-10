@@ -23,6 +23,8 @@ $hook_functions = array(
 	'integrate_admin_include' => '$sourcedir/Subs-AutoRotation.php',
 // SMF 2.1 Admin hooks:
 	'integrate_manage_attachments' => 'AutoRotation_AdminHook',
+	'integrate_helpadmin' => 'AutoRotation_LoadHelp',
+	'integrate_manage_help' => 'AutoRotation_LoadHelp',
 );
 
 // Adding or removing them?

@@ -2,52 +2,56 @@
 <!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
-<name>Automatic Attachment Rotation</name>
-<version>3.12</version>
+<name>Automatic Attachment Rotation (and Resize)</name>
+<version>4.0</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
-	<operation>
+	<operation>	<!-- line 936 -->
 		<search position="after"><![CDATA[// Fetch attachments.]]></search>
 		<add><![CDATA[require_once($sourcedir . '/Subs-AutoRotation.php');
 
 		]]></add>
 	</operation>
-	<operation>
-		<search position="after"><![CDATA[COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
+	<operation>	<!-- line 942 -->
+		<search position="after"><![CDATA[a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',]]></search>
 		<add><![CDATA[a.proper_rotation AS img_rotation, ]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 943 -->
 		<search position="before"><![CDATA[COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
 		<add><![CDATA[,
-					thumb.proper_rotation AS thumb_rotation, thumb.id_folder AS thumb_folder, 
+					thumb.proper_rotation AS thumb_rotation, thumb.id_folder AS thumb_folder,
 					thumb.file_hash AS thumb_hash, thumb.filename AS thumb_name]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 960 -->
 		<search position="replace"><![CDATA[$temp[$row['id_attach']] = $row;]]></search>
 		<add><![CDATA[$temp[$row['id_attach']] = AutoRotation_Display($row);]]></add>
 	</operation>
 
 	<!-- Download function -->
-	<operation>
+	<operation>	<!-- line 1217 -->
 		<search position="before"><![CDATA[global $txt, $modSettings, $user_info, $context, $topic, $smcFunc]]></search>
 		<add><![CDATA[, $sourcedir]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1219 -->
 		<search positon="before"><![CDATA[// Some defaults that we need.]]></search>
 		<add><![CDATA[require_once($sourcedir . '/Subs-AutoRotation.php');
-	
+
 	]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1233 -->
 		<search position="before"><![CDATA[SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member]]></search>
 		<add><![CDATA[, a.proper_rotation]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1254 -->
+		<search position="before"><![CDATA[SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member]]></search>
+		<add><![CDATA[, a.proper_rotation]]></add>
+	</operation>
+	<operation>	<!-- line 1268 -->
 		<search position="replace"><![CDATA[$is_approved, $id_member) = $smcFunc['db_fetch_row']($request);]]></search>
 		<add><![CDATA[$is_approved, $id_member, $proper_rotation) = $smcFunc['db_fetch_row']($request);]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1286 -->
 		<search position="before"><![CDATA[$filename = getAttachmentFilename($real_filename, $_REQUEST['attach'], $id_folder, false, $file_hash);]]></search>
 		<add><![CDATA[
 	if (!$proper_rotation && (isset($_REQUEST['type']) && $_REQUEST['type'] != 'avatar'))
@@ -56,13 +60,28 @@
 </file>
 <file name="$sourcedir/ManageAttachments.php">
 	<!-- ManageAttachments function -->
-	<operation>
-		<search position="replace"><![CDATA['remove' => 'RemoveAttachment',]]></search>
-		<add><![CDATA['remove' => 'AutoRotation_Remove',]]></add>
+	<operation>	<!-- line 131 -->
+		<search position="after"><![CDATA[// Pick the correct sub-action.]]></search>
+		<add><![CDATA[AutoRotation_AdminHook($subActions);
+	loadLanguage('AutoRotation');
+
+	]]></add>
 	</operation>
-	
+
 	<!-- ManageAttachmentSettings function -->
-	<operation>
+	<operation>	<!-- line 184 -->
+		<search position="after"><![CDATA[			// Thumbnail settings.
+]]></search>
+		<add><![CDATA[			// Added for resizing attachments.
+			array('check', 'attachment_image_reformat'),
+			array('check', 'attachment_resize_existing'),
+			array('text', 'attachment_jpeg_quality', 6),
+			array('text', 'attachment_image_width', 6),
+			array('text', 'attachment_image_height', 6),
+		'',
+]]></add>
+	</operation>
+	<operation>	<!-- line 189 -->
 		<search position="before"><![CDATA[array('text', 'attachmentThumbHeight', 6),]]></search>
 		<add><![CDATA[
 		'',
@@ -71,14 +90,14 @@
 	</operation>
 
 	<!-- BrowseFiles function -->
-	<operation>
+	<operation>	<!-- line 345 -->
 		<search position="replace"><![CDATA[	$link .= sprintf('%1$s?action=dlattach;topic=%2$d.0;attach=%3$d', $scripturl, $rowData['id_topic'], $rowData['id_attach']);]]></search>
 		<add><![CDATA[{
 							$time = filemtime(getAttachmentFilename($rowData['filename'], $rowData['id_attach'], $rowData['id_folder'], false, $rowData['file_hash']));
-							$link .= sprintf('%1$s?action=dlattach;topic=%2$d.0;attach=%3$d;ts=%4$d', $scripturl, $rowData['id_topic'], $rowData['id_attach'], $time);
+							$link .= sprintf('%1$s?action=dlattach;topic=%2$d.0;attach=%3$d', $scripturl, $rowData['id_topic'], $rowData['id_attach']);
 						}]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 447 -->
 		<search position="after"><![CDATA['check' => array(]]></search>
 		<add><![CDATA['orientation' => array(
 				'header' => array(
@@ -86,51 +105,73 @@
 					'style' => 'width: 1%',
 				),
 				'data' => array(
-					'function' => function ($rowData) use ($txt)
-					{
-						$str = sprintf('<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option></select>', $rowData['id_attach']);
-						return !empty($rowData['width']) && !empty($rowData['height']) ? $str : false;
-					},
+					'function' => create_function('$rowData', '
+						$str = sprintf(\'<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option></select>\', $rowData[\'id_attach\']);
+						return !empty($rowData[\'width\']) && !empty($rowData[\'height\']) ? $str : false;
+					'),
 					'style' => 'text-align: center',
 				),
 			),
 			]]></add>
 	</operation>
-	<operation>
-		<search position="before"><![CDATA[// Create the list.]]></search>
-		<add><![CDATA[
-	if ($context['browse_type'] == 'avatars')
-		unset($listOptions['columns']['orientation']);]]></add>
-	</operation>
-	<operation>
+	<operation>	<!-- line 473 -->
 		<search position="after"><![CDATA[$txt['quickmod_delete_selected'] . ]]></search>
 		<add><![CDATA[$txt['img_rotate'] . ' &amp; ' . ]]></add>
 	</operation>
+	<operation>	<!-- line 479 -->
+		<search position="before"><![CDATA[// Create the list.]]></search>
+		<add><![CDATA[
+	if ($context['browse_type'] != 'attachments')
+		unset($listOptions['columns']['orientation']);]]></add>
+	</operation>
 
 	<!-- list_getFiles function -->
-	<operation>
+	<operation>	<!-- line 513 -->
 		<search position="after"><![CDATA[a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board]]></search>
 		<add><![CDATA[a.id_folder, ]]></add>
 	</operation>
 </file>
+<file name="$sourcedir/PersonalMessage.php">
+	<!-- messagePostError function -->
+	<operation error="ignore">	<!-- line 2096 with PM Attachments installed -->
+		<search position="before"><![CDATA[if (!is_uploaded_file($_FILES['attachment']['tmp_name'][$n]) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['attachment']['tmp_name'][$n])))
+					fatal_lang_error('attach_timeout', 'critical');]]></search>
+		<add><![CDATA[
+
+				// Automatic Attachment Rotation (and Resize) alteration:
+				require_once($sourcedir . '/Subs-AutoRotation.php');
+				AutoRotation_Inbound($n, true);]]></add>
+	</operation>
+
+	<!-- MessagePost2 function -->
+	<operation error="ignore">	<!-- line 2596 with PM Attachments installed -->
+		<search position="after"><![CDATA[
+			// Check the total upload size for this post...
+]]></search>
+		<add><![CDATA[
+
+			// Automatic Attachment Rotation (and Resize) alteration:
+			require_once($sourcedir . '/Subs-AutoRotation.php');
+			AutoRotation_Inbound($n, true);]]></add>
+	</operation>
+</file>
 <file name="$sourcedir/Post.php">
 	<!-- Post function -->
-	<operation>
-		<search position="before"><![CDATA[global $sourcedir, $smcFunc, $language;
-
-	loadLanguage('Post');]]></search>
-		<add><![CDATA[
-	loadLanguage('AutoRotation');]]></add>
+	<operation>	<!-- line 91 -->
+		<search position="after"><![CDATA[
+	// You can't reply with a poll... hacker.]]></search>
+		<add><![CDATA[	loadLanguage('AutoRotation');
+]]></add>
 	</operation>
 
 	<!-- Post2 function -->
-	<operation>
+	<operation>	<!-- line 1271 -->
 		<search position="before"><![CDATA[require_once($sourcedir . '/Subs-Post.php');
 	loadLanguage('Post');]]></search>
 		<add><![CDATA[
 	loadLanguage('AutoRotation');]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1684 -->
 		<search position="after"><![CDATA[// ...or attach a new file...]]></search>
 		<add><![CDATA[// ...or rotate an existing attachment...
 	if (isset($_REQUEST['msg'], $_POST['orient']) && allowedTo('post_attachment'))
@@ -138,77 +179,219 @@
 		require_once($sourcedir . '/Subs-AutoRotation.php');
 		AutoRotation_Rotate();
 	}
-	
+
 	]]></add>
 	</operation>
 </file>
 <file name="$sourcedir/Subs-Attachments.php">
+	<operation>	<!-- line 985 -->
+		<search position="before"><![CDATA[if ($_FILES['attachment']['name'][$n] == '')
+			continue;]]></search>
+		<add><![CDATA[
+
+		// Automatic Attachment Rotation (and Resize) alteration:
+		require_once($sourcedir . '/Subs-AutoRotation.php');
+		AutoRotation_Inbound($n);]]></add>
+	</operation>
+	<operation>	<!-- line 1763 -->
+		<search position="after"><![CDATA[// Check the total upload size for this post...]]></search>
+		<add><![CDATA[
+
+			// Automatic Attachment Rotation (and Resize) alteration:
+			require_once($sourcedir . '/Subs-AutoRotation.php');
+			AutoRotation_Inbound($n);]]></add>
+	</operation>
+
+	<!-- createAttachment function -->
+	<operation>	<!-- line 2192 -->
+		<search position="after"><![CDATA[// If this is an image we need to set a few additional parameters.]]></search>
+		<add><![CDATA[// If the file format/mime type changed during reencoding update the database.
+	$size = @getimagesize($attachmentOptions['destination']);
+
+	if (!empty($size['mime']))
+		$mime = $size['mime'];
+	elseif (isset($validImageTypes[$size[2]]))
+		$mime = 'image/' . $validImageTypes[$size[2]];
+	else
+		$mime = '';
+
+	If (!empty($mime) && $attachmentOptions['mime_type'] != $mime)
+	{
+		$ext = substr(strchr('/', $mime), 1);
+		if ($ext == 'jpeg')
+			$ext = 'jpg';
+		$new_name = substr($attachmentOptions['name'], 0, -3) . '.' . $ext;
+		
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}attachments
+			SET
+				filename = {string:filename},
+				fileext = {string:fileext},
+				mime_type = {string:mime_type},
+				size = {int:size}
+			WHERE id_attach = {int:id_attach}',
+			array(
+				'filename' => $new_name,
+				'fileext' => $ext,
+				'mime_type' => $mime,
+				'size' => filesize($attachmentOptions['destination']),
+				'id_attach' => $attachmentOptions['id'],
+			)
+		);
+	}
+
+	]]></add>
+	</operation>
+
 	<!-- loadAttachmentContext function -->
-	<operation>
+	<operation>	<!-- line 1460 -->
 		<search position="after"><![CDATA[$attachmentData[$i] = array(]]></search>
 		<add><![CDATA[$time = filemtime(getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']));
 
 			]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1466 -->
 		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach]]></search>
 		<add><![CDATA[;ts=' . $time . ']]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1467 -->
 		<search position="before"><![CDATA['link' => '<a href="' . $scripturl . '?action=dlattach]]></search>
 		<add><![CDATA[;ts=' . $time . ']]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1476 -->
+		<search position="before"><![CDATA[if (!$attachmentData[$i]['is_image'])
+				continue;]]></search>
+		<add><![CDATA[
+
+			// Begin Automatic Attachment Rotation (and Resize) mod.
+			if ($attachmentData[$i]['is_image'] && $modSettings['attachment_resize_existing'])
+			{
+				// Get the file path
+				$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
+				list ($width, $height, $type) = @getimagesize($filename);
+
+				// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
+				// or attachment image width/height values are set and it's too wide/high,
+				// or it's not a BMP image and it's too large ...
+				if ($type == 6 || ($type != 2 && $modSettings['attachment_image_reformat']) || ($modSettings['attachment_image_width'] > 0 && $width > $modSettings['attachment_image_width']) || ($modSettings['attachment_image_height'] > 0 && $height > $modSettings['attachment_image_height']) || ($type != 6 && $attachmentData[$i]['size'] > $modSettings['attachmentSizeLimit']*1024))
+				{
+					// What size will we make this image?
+					$width = empty($modSettings['attachment_image_width']) ? $width : min($width, $modSettings['attachment_image_width']);
+					$height = empty($modSettings['attachment_image_height']) ? $height : min($height, $modSettings['attachment_image_height']);
+
+					// Resize it
+					require_once($sourcedir . '/Subs-Graphics.php');
+					if (resizeImageFile($filename, $filename . '.temp', $width, $height))
+					{
+						unlink($filename);
+						rename($filename . '.temp', $filename);
+
+						// Find the new dimensions and size
+						$info = getimagesize($filename);
+						list($attachment['width'], $attachment['height']) = $info;
+
+						$attachment['filesize'] = filesize($filename);
+						$attachmentData[$i]['byte_size'] = $attachment['filesize'];
+						$attachmentData[$i]['size'] = round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'];
+
+						// Change the filename if necessary.
+						if (($type == 6 || $modSettings['attachment_image_reformat']) && strrchr($attachment['filename'], '.') != '.jpg')
+						{
+							$attachment['filename'] = substr($attachment['filename'], 0, -(strlen(strrchr($attachment['filename'], '.')))) . '.jpg';
+							$attachmentData[$i]['name'] = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename']));
+
+							$smcFunc['db_query']('', '
+								UPDATE {db_prefix}attachments
+								SET width = {int:width},
+									height = {int:height},
+									size = {int:size},
+									filename = {string:filename},
+									fileext = {string:ext},
+									mime_type = {string:mime}
+								WHERE id_attach = {int:id_attach}
+								LIMIT 1',
+								array(
+									'width' => $attachment['width'],
+									'height' => $attachment['height'],
+									'size' => $attachment['filesize'],
+									'filename' => $attachment['filename'],
+									'ext' => 'jpg',
+									'mime' => 'image/jpeg',
+									'id_attach' => $attachment['id_attach'],
+								)
+							);
+						}
+						else
+						{
+							$smcFunc['db_query']('', '
+								UPDATE {db_prefix}attachments
+								SET width = {int:width},
+									height = {int:height},
+									size = {int:size}
+								WHERE id_attach = {int:id_attach}
+								LIMIT 1',
+								array(
+									'width' => $attachment['width'],
+									'height' => $attachment['height'],
+									'size' => $attachment['filesize'],
+									'id_attach' => $attachment['id_attach'],
+								)
+							);
+						}
+					}
+				}
+			}
+			// End Automatic Attachment Rotation (and Resize) mod.
+]]></add>
+	</operation>
+	<operation>	<!-- line 1562 -->
 		<search position="after"><![CDATA[
 				// Only adjust dimensions on successful thumbnail creation.]]></search>
 		<add><![CDATA[else
 					$thumb_realname = getAttachmentFilename($attachment['thumb_name'], $attachment['id_thumb'], $attachment['thumb_folder'], false, $attachment['thumb_hash']);
-					
+
 				// Get timestamp for thumbnail image:
 				$time = !empty($thumb_realname) && file_exists($thumb_realname) ? filemtime($thumb_realname) : false;
 ]]></add>
 	</operation>
-	<operation>
+	<operation>	<!-- line 1574 -->
 		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_thumb'] . ';image']]></search>
 		<add><![CDATA[ . ';ts=' . $time]]></add>
 	</operation>
 </file>
-<file name="$sourcedir/Subs-Graphics.php">
-	<!-- resizeImageFile function -->
-	<operation>
-		<search position="before"><![CDATA[require_once($sourcedir . '/Subs-Package.php');]]></search>
-		<add><![CDATA[
-	require_once($sourcedir . '/Subs-AutoRotation.php');]]></add>
-	</operation>
-	<operation>
-		<search position="before"><![CDATA[getimagesize($destination);]]></search>
-		<add><![CDATA[
-		$src_format = isset($sizes[2]) && isset($default_formats[$sizes[2]]) ? $default_formats[$sizes[2]] : false;
-		AutoRotation_Process($destination);]]></add>
-	</operation>
-	<operation>
-		<search position="before"><![CDATA[getimagesize($source);]]></search>
-		<add><![CDATA[
-		$src_format = isset($sizes[2]) && isset($default_formats[$sizes[2]]) ? $default_formats[$sizes[2]] : false;
-		AutoRotation_Process($source);]]></add>
+<file name="$sourcedir/Subs-PMAttachmentsAdmin.php" error="skip">
+	<!-- ManagePMAttachmentSettings function -->
+	<operation error="ignore">	<!-- line 117 -->
+		<search position="after"><![CDATA[			// Thumbnail settings.
+]]></search>
+		<add><![CDATA[			// Added for resizing PM attachments.
+			array('check', 'pm_attachment_image_reformat'),
+			array('text', 'pm_attachment_jpeg_quality', 6),
+			array('text', 'pm_attachment_image_width', 6),
+			array('text', 'pm_attachment_image_height', 6),
+		'',
+]]></add>
 	</operation>
 </file>
 <file name="$themedir/ManageAttachments.template.php">
 	<operation>
 		<search position="before"><![CDATA[<input type="hidden" name="type" value="avatars">
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-					<input type="hidden" name="sa" value="byAge">
-				</dl>]]></search>
+					<input type="hidden" name="sa" value="byAge">]]></search>
 		<add><![CDATA[
-			</form>
+				</form>
+			</div>
+			<span class="botslice"><span></span></span>
 		</div>
 		<div class="cat_bar">
-			<h3 class="catbg">', $txt['attachment_pruning'], '</h3>
+			<h3 class="catbg">', $txt['attachment_clear_rotation_title'], '</h3>
 		</div>
-		<div class="windowbg2">
-			<form action="', $scripturl, '?action=admin;area=manageattachments;sa=clearflags;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
-				<p>', $txt['attachment_clear_rotation_desc'], '</p>
-				<input type="submit" name="submit" value="', $txt['attachment_clear_rotation_button'], '" class="button_submit" />]]></add>
+		<div class="windowbg">
+			<span class="topslice"><span></span></span>
+			<div class="content">
+				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=clearflags;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="', $context['character_set'], '">
+					<p>', $txt['attachment_clear_rotation_desc'], '</p>
+					<input type="submit" name="submit" value="', $txt['attachment_clear_rotation_button'], '" class="button_submit" />]]></add>
 	</operation>
 </file>
 <file name="$themedir/Post.template.php">

@@ -26,6 +26,34 @@ $smcFunc['db_add_column'](
 );
 
 //==============================================================================
+// Add resize options to the settings table
+//==============================================================================
+$smcFunc['db_insert']('ignore',
+	'{db_prefix}settings',
+	array('variable' => 'string', 'value' => 'int'),
+	array(
+		array('attachment_image_reformat', '0'),
+		array('attachment_resize_existing', '0'),
+		array('attachment_jpeg_quality', '100'),
+		array('attachment_image_width', '0'),
+		array('attachment_image_height', '0'),
+	),
+	array('variable')
+);
+
+$smcFunc['db_insert']('ignore',
+	'{db_prefix}settings',
+	array('variable' => 'string', 'value' => 'int'),
+	array(
+		array('pm_attachment_image_reformat', '0'),
+		array('pm_attachment_jpeg_quality', '100'),
+		array('pm_attachment_image_width', '0'),
+		array('pm_attachment_image_height', '0'),
+	),
+	array('variable')
+);
+
+//==============================================================================
 // Set the default value for the PAM mode if not already set:
 //==============================================================================
 if (!isset($modSettings['PAM_mode']))

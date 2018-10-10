@@ -1,3 +1,8 @@
+v4.0 - March 27th, 2018
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], fixed issue where images with very large dimensions could not be rotated ([url=http://custom.simplemachines.org/mods/index.php?mod=4111]Image Processing Memory Limit[/url] mod may also be required if issue persists).
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], code added to automatically resize images in new and existing topics.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], added automatic rotation and automatic resize for images in PMs if [url=https://custom.simplemachines.org/mods/index.php?mod=1974]'PM Attachments'[/url] mod is installed.
+
 v3.12 - February 22nd, 2018
 o Added Dutch translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=287786]@rjen[/url]!
 o 2nd attempt: Changed order of rotation/flip strings in templates, per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url]'s post above.

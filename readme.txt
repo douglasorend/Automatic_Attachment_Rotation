@@ -1,11 +1,17 @@
 [hr]
-[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v3.11[/b][/size][/color]
+[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION v4.0[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4087]Link to Mod[/url]
 [/center]
 [hr]
 
 [color=blue][b][size=12pt][u]Introduction[/u][/size][/b][/color]
 This mod allows the automatic rotation and/or flipping of images [b]ONLY IF[/b] the EXIF information contained within (if such exists) indicates that such processing is required in order to show the picture upright.
+
+Features for automatic image resizing:
+ - Option to reformat non-JPEG images to JPEG in topics and PMs;
+ - Option to resize existing images in topics;
+ - Option to set the JPEG quality factor in topics and PMs; and
+ - Option to set max width and height values for attached images that are different to values for posted images in topics and PMs.
 
 [b]NOTE:[/b] SMF contains an option called [b]Re-encode potentially dangerous image attachments[/b], which is turned on by default.  This re-encoding removes the orientation information from attachments (amongst other things), which means that attachments uploaded prior to this mod being installed will [b]NOT[/b] be able to rotated properly, as the EXIF information is missing from the re-encoded attachment file!
 
@@ -29,6 +35,10 @@ o Vertical Flip, Rotate 90° Right
 
 [color=blue][b][size=12pt][u]Compatibility Notes[/u][/size][/b][/color]
 This mod was tested on SMF 2.0.12 and 2.1 Beta 3, but should work on SMF 2.0 and up.  SMF 1.x is not and will not be supported.
+
+The [url=https://custom.simplemachines.org/mods/index.php?mod=3255]Improved Attachment Error Handling[/url] modshould be installed [b]BEFORE[/b] this mod (if so desired) to avoid install errors.
+
+The [url=https://custom.simplemachines.org/mods/index.php?mod=2206]Resize Attachment Images[/url] mod [b]SHOULD NOT[/b] be installed when installing this version, as this mod contains similar functionality.
 
 [color=blue][b][size=12pt][u]Translators[/u][/size][/b][/color]
 o Dutch: [url=https://www.simplemachines.org/community/index.php?action=profile;u=287786]@rjen[/url]
