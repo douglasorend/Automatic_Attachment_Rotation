@@ -2,10 +2,10 @@
 
 // Begin Resize Existing Images Text Strings
 $txt['resize_images'] = 'Aanpassen bestaande afbeeldingen';
-$txt['resize_images_desc'] = '<i>Aanpassen bestaande afbeeldingen</i> past formaat en grootte van bestaande afbeeldingen aan volgens de opties (Niet-JPEG afbeeldingen naar JPEG, JPEG kwaliteit factor en/of maximale afbeelding breedte/hoogte) zoals ingesteld onder <i>Beheer -> Forum -> Bijlagen en Avatars -> Bijlage-instellingen</i>.';
+$txt['resize_images_desc'] = 'De functie <i>Aanpassen bestaande afbeeldingen</i> past formaat en grootte van bestaande afbeeldingen aan volgens de opties (Niet-JPEG afbeeldingen naar JPEG, JPEG kwaliteit factor en/of maximale afbeelding breedte/hoogte) zoals ingesteld onder <i>Beheer -> Forum -> Bijlagen en Avatars -> Bijlage-instellingen</i>. Let op: deze lijst toont alleen afbeelding bestanden welke onder de geldende instelingen aangepast moeten worden.';
 
 $txt['resize_images_batch'] = 'In Batch aanpassen van bestaande afbeeldingen';
-$txt['resize_images_batch_desc'] = '<i>Bestaande afbeelding in batch aanpassen</i> hiermee worden <b>alle</b> bestaande afbeeldingen aangepast volgens de ingestelde opties (Niet-JPEG afbeeldingen naar JPEG, JPEG kwaliteit factor en/of maximale afbeelding breedte/hoogte) zoals ingesteld onder <i>Beheer -> Forum -> Bijlagen en Avatars -> Bijlage-instellingen</i>.<br/><br/>Om overbelasting van de server te voorkomen wordt het aantal afbleedingen per bewerking ingesteld volgens de waarde bij <i>Beheer -> Forum -> Berichten en Topics -> Topicinstellingen -> Aantal berichten per pagina in een topicpagina</i>.';
+$txt['resize_images_batch_desc'] = 'Door het uitvoeren van deze onderhoudstaak worden <b>alle</b> bestaande afbeeldingen aangepast volgens de ingestelde opties (Niet-JPEG afbeeldingen naar JPEG, JPEG kwaliteit factor en/of maximale afbeelding breedte/hoogte) zoals ingesteld onder <i>Beheer -> Forum -> Bijlagen en Avatars -> Bijlage-instellingen</i>.<br/><br/>Om overbelasting van de server te voorkomen wordt het aantal afbleedingen per bewerking ingesteld volgens de waarde bij <i>Beheer -> Forum -> Berichten en Topics -> Topicinstellingen -> Aantal berichten per pagina in een topicpagina</i>.';
 
 $txt['resize_reformat_images'] = 'Aanpassen bestaande afbeeldingen';
 
@@ -21,7 +21,7 @@ $txt['resize_batch_size'] = '<b>Afbeeldingen worden aangepast in batches van : <
 $txt['resize_images_to_resize'] = '<b>Afbeeldingen nog aan te passen : </b>';
 
 $txt['resize_images_complete'] = 'Resultaat van aanpassen bestaande afbeeldingen';
-$txt['resize_images_empty_desc'] = 'Er zijn afbeeldingen gevonden voor <i>Aanpassen bestaande afbeeldingen</i>.';
+$txt['resize_images_empty_desc'] = 'Er zijn geen afbeeldingen gevonden die in aanmerking komen voor <i>Aanpassen bestaande afbeeldingen</i>.';
 $txt['resize_images_complete_desc'] = '<i>Aanpassen bestaande afbeeldingen</i> is klaar met verwerken van de afbeeldingen.';
 $txt['resize_start_time'] = '<b>Start tijd : </b>';
 $txt['resize_finish_time'] = '<b>Eind tijd : </b>';

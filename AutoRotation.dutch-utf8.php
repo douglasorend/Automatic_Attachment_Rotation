@@ -30,19 +30,21 @@ $txt['AutoRotation_memory_issue'] = 'Het is niet mogelijk om %1$d geheugen toe t
 
 // Added for Automatic Attachment Rotation (and Resize).
 $txt['attachment_auto_rotate'] = 'Afbeeldingen automatisch draaien<div class="smalltext">(Alleen mogelijk als de JPEG bestanden EXIF orientatie data bevatten)</div>';
-$txt['attachment_image_reformat'] = 'Niet-JPEG afbeeldingen omzetten naar JPEG.';
+$txt['attachment_image_reformat'] = 'Niet-JPEG afbeeldingen omzetten naar JPEG';
 $txt['attachment_resize_existing'] = 'Bestaande bijlagen aanpassen';
+$txt['attachment_resize_backup'] = 'Keep backup of original image file when resizing';
 $txt['attachment_jpeg_quality'] = 'JPEG kwaliteits factor<div class="smalltext">(Maximaal 100, standaard 100)</div>';
-$txt['attachment_image_width'] = 'Maximale breedte van afbeeldingen in bijlage.<div class="smalltext">(0 voor geen maximum)</div>';
-$txt['attachment_image_height'] = 'Maximale hoogte van afbeeldingen in bijlage.<div class="smalltext">(0 voor geen maximum)</div>';
+$txt['attachment_image_width'] = 'Maximale breedte van afbeeldingen in bijlage<div class="smalltext">(0 voor geen maximum)</div>';
+$txt['attachment_image_height'] = 'Maximale hoogte van afbeeldingen in bijlage<div class="smalltext">(0 voor geen maximum)</div>';
 
-$txt['pm_attachment_image_reformat'] = 'Niet-JPEG afbeeldingen omzetten naar JPEG.';
+$txt['pm_attachment_image_reformat'] = 'Niet-JPEG afbeeldingen omzetten naar JPEG';
 $txt['pm_attachment_jpeg_quality'] = 'JPEG kwaliteits factor<div class="smalltext">(Maximaal 100, standaard 100)</div>';
-$txt['pm_attachment_image_width'] = 'Maximale breedte van afbeeldingen in bijlage.<div class="smalltext">(0 voor geen maximum)</div>';
-$txt['pm_attachment_image_height'] = 'Maximale hoogte van afbeeldingen in bijlage.<div class="smalltext">(0 voor geen maximum)</div>';
+$txt['pm_attachment_image_width'] = 'Maximale breedte van afbeeldingen in bijlage<div class="smalltext">(0 voor geen maximum)</div>';
+$txt['pm_attachment_image_height'] = 'Maximale hoogte van afbeeldingen in bijlage<div class="smalltext">(0 voor geen maximum)</div>';
 
 $helptxt['attachment_image_reformat'] = 'Als je deze optie selecteert zullen niet-JPEG afbeeldingen worden omgezet naar het JPEG formaat';
 $helptxt['attachment_resize_existing'] = 'Als je deze optie selecteert zullen bestaande afbeeldingen die groter zijn dan de ingestelde afmetingen aangepast worden.';
+$helptxt['attachment_resize_backup'] = 'If this option is enabled (and the option <i>\'Resize existing images\'</i> is also enabled) the original image file will be kept in the <i>attachmentsPreREI<i> directory.';
 $helptxt['attachment_jpeg_quality'] = 'Hiermee bepaal je de JPEG kwaliteits factor. Hoe hoger het getal hoe beter de kwaliteit maar dit geeft ook een groter bestand.';
 $helptxt['pm_attachment_image_reformat'] = 'Als je deze optie selecteert zullen niet-JPEG afbeeldingen worden omgezet naar het JPEG formaat';
 $helptxt['pm_attachment_jpeg_quality'] = 'Hiermee bepaal je de JPEG kwaliteits factor. Hoe hoger het getal hoe beter de kwaliteit maar dit geeft ook een groter bestand.';

@@ -1,3 +1,11 @@
+V5.3 - April 30th, 2018
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970490#msg3970490]@rjen[/url] - updated Dutch language files for 'Resize Exisitng Images'.
+o Updated English language files for 'Resize Exisitng Images' to provide more detailed description for manual/batch options.
+o Changed behaviour of automatic image resizing when displaying a post so that images are [b]only[/b] resized if [i]'Resize existing images'[/i] is selected (in previous versions of this mod they were also resized when [i]'Reformat non-JPEG images to JPEG'[/i] was selected).
+o Resolved issue that was causing image files saved with '_JPG' in their filename to be incorrectly renamed to '_jpg' in the database (this only affected image attachments created with SMF 1.x).
+o Added option to keep backup of original image file when Attachment Setting [i]'Resize exisitng images'[/i] is enabled.
+o Updated image resizing code for automatic, manual and batch resizing modes to create backup of the original image file and restore it if the new image file is empty.
+
 V5.2 - April 28th, 2018
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970435#msg3970435]@rjen[/url] - fixed image and post links for images in Browse files > Resize Existing Images list.
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970435#msg3970435]@rjen[/url] - added Dutch language files.

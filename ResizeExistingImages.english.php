@@ -2,10 +2,10 @@
 
 // Begin Resize Existing Images Text Strings
 $txt['resize_images'] = 'Resize Existing Images';
-$txt['resize_images_desc'] = '<i>Resize Existing Images</i> resizes and/or reformats existing images to match the options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.';
+$txt['resize_images_desc'] = '<i>Resize Existing Images</i> resizes and/or reformats existing images to match the options (ie, Max size per attachment, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.<br/><br/><b>Note:</b> Only images that have one or more attributes which are different to the Attachment Settings will be listed here.';
 
 $txt['resize_images_batch'] = 'Batch Resize Existing Images';
-$txt['resize_images_batch_desc'] = '<i>Batch Resize Existing Images</i> resizes and/or reformats <b>all</b> existing images to match the options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.<br/><br/>In order to prevent server overload the number of images processed in each pass is the value specified by <i>Admin -> Forum -> Posts and Topics -> Topic Settings -> Number of posts per page in a topic page</i>.';
+$txt['resize_images_batch_desc'] = '<i>Batch Resize Existing Images</i> resizes and/or reformats <b>all</b> existing images to match the options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.<br/><br/>In order to prevent server overload the number of images processed in each pass is the value specified by <i>Admin -> Forum -> Posts and Topics -> Topic Settings -> Number of posts per page in a topic page</i>.<br/><br/><b>Note:</b> Only images that have one or more attributes which are different to the Attachment Settings will be listed here.';
 
 $txt['resize_reformat_images'] = 'Resize and/or Reformat Existing Images';
 

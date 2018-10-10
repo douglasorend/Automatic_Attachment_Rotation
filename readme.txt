@@ -1,20 +1,20 @@
 [hr]
-[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION (AND RESIZE) v5.2[/b][/size][/color]
+[center][color=red][size=16pt][b]AUTOMATIC ATTACHMENT ROTATION (AND RESIZE) v5.3[/b][/size][/color]
 [url=http://www.simplemachines.org/community/index.php?action=profile;u=253913][b]By Dougiefresh[/b][/url] -> [url=http://custom.simplemachines.org/mods/index.php?mod=4087]Link to Mod[/url]
 [/center]
 [hr]
 
 [color=blue][b][size=12pt][u]Introduction[/u][/size][/b][/color]
-This mod allows the automatic rotation and/or flipping of images [b]ONLY IF[/b] the EXIF information contained within (if such exists) indicates that such processing is required in order to show the picture upright.
+This mod allows the automatic rotation and/or flipping of images [b]ONLY IF[/b] the EXIF information contained within (if such exists) indicates that such processing is required in order to show the picture  in the correct orientation.
 
-[b]NOTE:[/b] SMF contains an option called [b]Re-encode potentially dangerous image attachments[/b], which is turned on by default.  This re-encoding removes the orientation information from attachments (amongst other things), which means that attachments uploaded prior to this mod being installed will [b]NOT[/b] be able to rotated properly, as the EXIF information is missing from the re-encoded attachment file!
+[b]NOTE:[/b] SMF contains an option called [b]Re-encode potentially dangerous image attachments[/b], which is turned on by default.  This re-encoding removes the orientation information from attachments (amongst other things), which means attachments uploaded prior to this mod being installed will [b]NOT[/b] be able to rotated properly, as the EXIF information is missing from the re-encoded attachment file!
 
 [b]Major changes introduced in v4.0[/b]
 o Option to enable/disable automatic image rotation.
 o Code update to enable automatic image resizing/reformatting in posts (and PMs if the [url=https://custom.simplemachines.org/mods/index.php?mod=1974]PM Attachments[/url] mod is installed).
 
 [b]Major change introduced in v5.0[/b]
-o Option to manually or batch resize/reformat existing images using 'Attachment Settings' options (non-JPEG images will only be reformatted to JPEG if the [i]Reformat non-JPEG images to JPEG[/i] option is enabled).
+o Option to automatically, manually or batch resize/reformat existing images using 'Attachment Settings' options (non-JPEG images will only be reformatted to JPEG if the [i]Reformat non-JPEG images to JPEG[/i] option is enabled).
 
 
 [color=blue][b][size=12pt][u]Post Screen Changes[/u][/size][/b][/color]
@@ -29,8 +29,16 @@ o Horizontal Flip, Rotate 90[sup]o[/sup] Right
 o Vertical Flip, Rotate 90[sup]o[/sup] Right
 
 
+[color=blue][b][size=12pt][u]Automatic Resizing of Existing Images[/u][/size][/b][/color]
+When a post is dispayed, and if the Attachment Setting [i]Resize existing images[/i] option is enabled, images in the post will be automatically resized (and reformatted to JPEG if the Attachment Setting option [i]Reformat non-JPEG images to JPEG[/i] is enabled) using the same Attachment Setting options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or maximum width/height) that are applied to new image attachments in posts.  In addition, if the Attachment Setting option [i]Create backup of original image file when resizing[/i] is also enabled the original image file will be saved to the attachments directiory with the extension '.rei'.
+
+
+[color=blue][b][size=12pt][u]Manual Resizing of Existing Images[/u][/size][/b][/color]
+This feature, which can be accessed via [b]Admin => Forum => Attachments and Avatars => Browse Files => Resize Existing Images[/b], can be used to selectively resize/reformat existing images using the same Attachment Setting options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or maximum width/height) that are applied to new image attachments in posts.
+
+
 [color=blue][b][size=12pt][u]Batch Resizing of Existing Images[/u][/size][/b][/color]
-This feature will resize/reformat [b]all[/b] existing images using the same option settings (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or maximum width/height) that are applied to new image attachments in posts and/or PMs.
+This feature, which can be accessed via [b]Admin => Forum => Attachments and Avatars => File Maintenance => Batch Resize Existing Images[/b], will resize/reformat [b]all[/b] existing images using the same Attachment Setting options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or maximum width/height) that are applied to new image attachments in posts.
  
 The forum should be configured as follows [b]prior[/b] to commencing batch resizing:
 o [i]Admin => Configuration => Server Settings => General => Enable Maintenance Mode[/i] should be [b]enabled[/b].
@@ -42,7 +50,7 @@ o [i]Admin => Forum => Attachments and Avatars => File Maintenance => Attachment
 [b]Important notes for batch resizing:[/b]
 o Non-JPEG images will [b]only[/b] be reformatted to JPEG if the [i]Reformat non-JPEG images to JPEG[/i] option is enabled.
 o Existing [i]'attachments'[/i] database table will be copied to [i]'attachmentsPreREI'[/i] database table. *
-o Original image files will be moved to [i]'attachmentsPreREI'[/i] directory/folder. *
+o Original image files are saved to the [i]'attachmentsPreREI'[/i] directory/folder. *
 o File timestamp for resized image file is set to match timestamp of original image file.
 o Batch processing progress information is displayed and updated.
 o The results of the batch resizing process will be displayed on completion and also written to the forum error log file.
@@ -56,7 +64,7 @@ o [i]Admin => Forum => Posts and Topics => Topic Settings => Number of posts per
 
 
 [color=blue][b][size=12pt][u]Admin Changes[/u][/size][/b][/color]
-In [b]Admin[/b] => [b]Forum[/b] => [b]Attachments and Avatars[/b]:
+In [b]Admin => Forum => Attachments and Avatars[/b]:
 o [b]Browse Files[/b]: There is a new column (and associated button) for rotating/flipping images - the options for rotating/flipping images are only shown for image attachments.  There is also a new horizontal tab labelled [i]'Resize Existing Images'[/i] that can be used for manually resizing/reformatting existing images.
 o [b]Attachment Settings[/b]: Options to enable/disable automatic image rotation and automatic resizing of existing images, option to reformat non-JPEG images to JPEG and options to set JPEG quality factor and max width/height values for attached images.
 o [b]File Maintenance[/b]: There is a new section for [i]Batch Resize Existing Images[/i].  There is also a new section for [i]Reset Orientation Flag[/i].

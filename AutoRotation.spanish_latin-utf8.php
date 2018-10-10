@@ -29,19 +29,21 @@ $txt['AutoRotation_log_error'] = '¿Error de memoria de registro al girar la ima
 $txt['AutoRotation_memory_issue'] = 'No se puede asignar %1$d de memoria para la rotación de la imagen.';
 
 // Added for Automatic Attachment Rotation (and Resize).
-//$txt['attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG.';
+//$txt['attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG';
 //$txt['attachment_resize_existing'] = 'Resize existing images';
+//$txt['attachment_resize_backup'] = 'Keep backup of original image file when resizing';
 //$txt['attachment_jpeg_quality'] = 'JPEG quality factor<div class="smalltext">(Maximum 100, default 100)</div>';
-//$txt['attachment_image_width'] = 'Maximum width of attached images.<div class="smalltext">(0 for no maximum width)</div>';
-//$txt['attachment_image_height'] = 'Maximum height of attached images.<div class="smalltext">(0 for no maximum height)</div>';
+//$txt['attachment_image_width'] = 'Maximum width of attached images<div class="smalltext">(0 for no maximum width)</div>';
+//$txt['attachment_image_height'] = 'Maximum height of attached images<div class="smalltext">(0 for no maximum height)</div>';
 
 //$txt['pm_attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG.';
 //$txt['pm_attachment_jpeg_quality'] = 'JPEG quality factor<div class="smalltext">(Maximum 100, default 100)</div>';
-//$txt['pm_attachment_image_width'] = 'Maximum width of attached images.<div class="smalltext">(0 for no maximum width)</div>';
-//$txt['pm_attachment_image_height'] = 'Maximum height of attached images.<div class="smalltext">(0 for no maximum height)</div>';
+//$txt['pm_attachment_image_width'] = 'Maximum width of attached images<div class="smalltext">(0 for no maximum width)</div>';
+//$txt['pm_attachment_image_height'] = 'Maximum height of attached images<div class="smalltext">(0 for no maximum height)</div>';
 
 //$helptxt['attachment_image_reformat'] = 'Selecting this option will reformat non-JPEG images as JPEG';
 //$helptxt['attachment_resize_existing'] = 'Selecting this option will resize any existing images which are larger than the set dimensions for attached images.';
+//$helptxt['attachment_resize_backup'] = 'If this option is enabled (and the option <i>\'Resize existing images\'</i> is also enabled) the original image file will be kept in the <i>attachmentsPreREI<i> directory.';
 //$helptxt['attachment_jpeg_quality'] = 'This sets the JPEG quality factor. A higher number increases image quality but also increases the attachment file size.';
 //$helptxt['pm_attachment_image_reformat'] = 'Selecting this option will reformat non-JPEG images as JPEG';
 //$helptxt['pm_attachment_jpeg_quality'] = 'This sets the JPEG quality factor. A higher number increases image quality but also increases the attachment file size.';

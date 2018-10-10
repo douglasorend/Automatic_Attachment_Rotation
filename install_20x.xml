@@ -3,55 +3,55 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation (and Resize)</name>
-<version>5.2</version>
+<version>5.3</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
-	<operation>	<!-- line 936 -->
+	<operation> <!-- line 936 -->
 		<search position="after"><![CDATA[// Fetch attachments.]]></search>
 		<add><![CDATA[require_once($sourcedir . '/Subs-AutoRotation.php');
 
 		]]></add>
 	</operation>
-	<operation>	<!-- line 942 -->
+	<operation> <!-- line 942 -->
 		<search position="after"><![CDATA[a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',]]></search>
 		<add><![CDATA[a.proper_rotation AS img_rotation, ]]></add>
 	</operation>
-	<operation>	<!-- line 943 -->
+	<operation> <!-- line 943 -->
 		<search position="before"><![CDATA[IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
 		<add><![CDATA[,
 					thumb.proper_rotation AS thumb_rotation, thumb.id_folder AS thumb_folder,
 					thumb.file_hash AS thumb_hash, thumb.filename AS thumb_name]]></add>
 	</operation>
-	<operation>	<!-- line 960 -->
+	<operation> <!-- line 960 -->
 		<search position="replace"><![CDATA[$temp[$row['id_attach']] = $row;]]></search>
 		<add><![CDATA[$temp[$row['id_attach']] = AutoRotation_Display($row);]]></add>
 	</operation>
 
 	<!-- Download function -->
-	<operation>	<!-- line 1217 -->
+	<operation> <!-- line 1217 -->
 		<search position="before"><![CDATA[global $txt, $modSettings, $user_info, $scripturl, $context, $sourcedir, $topic, $smcFunc]]></search>
 		<add><![CDATA[, $sourcedir]]></add>
 	</operation>
-	<operation>	<!-- line 1219 -->
+	<operation> <!-- line 1219 -->
 		<search positon="before"><![CDATA[// Some defaults that we need.]]></search>
 		<add><![CDATA[require_once($sourcedir . '/Subs-AutoRotation.php');
 
 	]]></add>
 	</operation>
-	<operation>	<!-- line 1233 -->
+	<operation> <!-- line 1233 -->
 		<search position="before"><![CDATA[SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member]]></search>
 		<add><![CDATA[, proper_rotation]]></add>
 	</operation>
-	<operation>	<!-- line 1254 -->
+	<operation> <!-- line 1254 -->
 		<search position="before"><![CDATA[SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member]]></search>
 		<add><![CDATA[, a.proper_rotation]]></add>
 	</operation>
-	<operation>	<!-- line 1268 -->
+	<operation> <!-- line 1268 -->
 		<search position="replace"><![CDATA[$is_approved, $id_member) = $smcFunc['db_fetch_row']($request);]]></search>
 		<add><![CDATA[$is_approved, $id_member, $proper_rotation) = $smcFunc['db_fetch_row']($request);]]></add>
 	</operation>
-	<operation>	<!-- line 1286 -->
+	<operation> <!-- line 1286 -->
 		<search position="before"><![CDATA[$filename = getAttachmentFilename($real_filename, $_REQUEST['attach'], $id_folder, false, $file_hash);]]></search>
 		<add><![CDATA[
 	if (!$proper_rotation && (isset($_REQUEST['type']) && $_REQUEST['type'] != 'avatar'))
@@ -59,40 +59,47 @@
 	</operation>
 
 	<!-- loadAttachmentContext function -->
-	<operation>	<!-- line 1460 -->
+	<operation> <!-- line 1460 -->
 		<search position="after"><![CDATA[$attachmentData[$i] = array(]]></search>
 		<add><![CDATA[$time = filemtime(getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']));
 
 			]]></add>
 	</operation>
-	<operation>	<!-- line 1466 -->
+	<operation> <!-- line 1466 -->
 		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach]]></search>
 		<add><![CDATA[;ts=' . $time . ']]></add>
 	</operation>
-	<operation>	<!-- line 1467 -->
+	<operation> <!-- line 1467 -->
 		<search position="before"><![CDATA['link' => '<a href="' . $scripturl . '?action=dlattach]]></search>
 		<add><![CDATA[;ts=' . $time . ']]></add>
 	</operation>
-	<operation>	<!-- line 1469 -->
+	<operation> <!-- line 1469 -->
 		<search position="before"><![CDATA[				'is_approved' => $attachment['approved'],]]></search>
 		<add><![CDATA[
 				'jpeg_quality' => !empty($attachment['jpeg_quality']) ? $attachment['jpeg_quality'] : 100,]]></add>
 	</operation>
-	<operation>	<!-- line 1476 -->
+	<operation> <!-- line 1476 -->
 		<search position="before"><![CDATA[if (!$attachmentData[$i]['is_image'])
 				continue;]]></search>
 		<add><![CDATA[
 
 			// Begin Automatic Attachment Rotation (and Resize) mod.
-			if ($attachmentData[$i]['is_image'] && (!empty($modSettings['attachment_image_reformat']) || !empty($modSettings['attachment_resize_existing'])))
+			if (!empty($modSettings['attachment_resize_existing']))
 			{
-				// Get the file path
+				global $boarddir;
+
+				$attsPreREI = $boarddir . '/attachmentsPreREI';
+				if (!file_exists($attsPreREI))
+					mkdir($attsPreREI, 0755, true);
+
+				// Get the file path.
 				$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 
-				// Find out image mime and type.
-				$imageSize = @getimagesize($filename);
+				// Get the image dimensions and type.
 				list ($width, $height, $type) = @getimagesize($filename);
-				if (!empty($modSettings['attachment_image_reformat']))
+
+				// Set the preferred format to JPEG if reformatting or image is BMP.
+				if (!empty($modSettings['attachment_image_reformat']) || $type == 6)
 					$preferred_format = 2;
 				else
 					$preferred_format = $type;
@@ -104,63 +111,87 @@
 				// If the image needs to be resized, saved with a lower JPEG quality,
 					// or it's not a JPEG image and it needs to be reformatted to JPEG ...
 				require_once($sourcedir . '/Subs-AutoRotation.php');
-				if ((AutoRotation_Aspect($width, $height) || ($imageSize['mime'] == 'image/jpeg' && $jpegQuality > $max_jpegQuality))
-					|| ($imageSize['mime'] != 'image/jpeg' && !empty($modSettings['attachment_image_reformat'])))
+				if ((AutoRotation_Aspect($width, $height) || ($type == 2 && $jpegQuality > $max_jpegQuality))
+					|| ($type != 2 && !empty($modSettings['attachment_image_reformat'])))
 				{
 					// Set the value for JPEG quality.
 					$jpegQuality = $max_jpegQuality;
+
+					// Get the timestamp of the original image file.
+					$timestamp = filemtime($filename);
+
+					// Make a backup copy of the original image file.
+					$reiFilename = $attsPreREI . '/' . pathinfo($filename, PATHINFO_FILENAME);
+					copy($filename, $reiFilename);
+					touch($reiFilename, $timestamp);
 
 					// Resize it
 					require_once($sourcedir . '/Subs-Graphics.php');
 					if (resizeImageFile($filename, $filename . '.temp', $width, $height, $preferred_format, $jpegQuality))
 					{
-						unlink($filename);
+						// Rename the temporary image file to the same name as the original image file.
 						rename($filename . '.temp', $filename);
 
-						// Find the new dimensions and size
-						$info = getimagesize($filename);
-						list($attachment['width'], $attachment['height']) = $info;
+						// Make sure the file is not empty.
+						if (filesize($filename) == 0)
+						{
+							// Oops - something went wrong! Log an error message, restore the original image file and reset the preferred format.
+							error_log(print_r("resizeImageFile FAILED for" . $filename . " - the original image file has been restored.", true));
+							@unlink($filename);
+							@unlink($filename . '.temp');
+							rename($reiFilename, $filename);
+							$preferred_format = $type;
+						}
+						// The file size is greater than 0 - delete the backup copy of the original image file if it is not required.
+						elseif (empty($modSettings['attachment_resize_backup']))
+							@unlink($reiFilename);
 
+						// Get the file size.
 						$attachment['filesize'] = filesize($filename);
 						$attachmentData[$i]['byte_size'] = $attachment['filesize'];
 						$attachmentData[$i]['size'] = round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'];
-						$attachment['jpeg_quality'] = $jpegQuality;
 
-						// Update the image attachment details.
+						// Get the image dimensions.
+						list ($attachment['width'], $attachment['height']) = getimagesize($filename);
+
+						// The preferred format is JPEG.
 						if ($preferred_format == 2)
 						{
-							// Change the file suffix to 'jpg' if necessary.
-							if (strrchr($attachment['filename'], '.') != '.jpg')
+							// If the original image type is not JPEG change the file extension to 'jpg'.
+							if ($type != 2)
 							{
 								$attachment['filename'] = substr($attachment['filename'], 0, -(strlen(strrchr($attachment['filename'], '.')))) . '.jpg';
 								$attachmentData[$i]['name'] = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename']));
 							}
 
+							// Update the image attachment details.
 							$smcFunc['db_query']('', '
 								UPDATE {db_prefix}attachments
 								SET width = {int:width},
 									height = {int:height},
-									jpeg_quality = {int:jpeg_quality},
 									size = {int:size},
 									filename = {string:filename},
 									fileext = {string:ext},
-									mime_type = {string:mime}
+									mime_type = {string:mime},
+									jpeg_quality = {int:jpeg_quality}
 								WHERE id_attach = {int:id_attach}
 								LIMIT 1',
 								array(
 									'width' => $attachment['width'],
 									'height' => $attachment['height'],
-									'jpeg_quality' => $attachment['jpeg_quality'],
 									'size' => $attachment['filesize'],
 									'filename' => $attachment['filename'],
 									'ext' => 'jpg',
 									'mime' => 'image/jpeg',
+									'jpeg_quality' => $jpegQuality,
 									'id_attach' => $attachment['id_attach'],
 								)
 							);
 						}
+						// The preferred format is not JPEG.
 						else
 						{
+							// Update the image attachment details.
 							$smcFunc['db_query']('', '
 								UPDATE {db_prefix}attachments
 								SET width = {int:width},
@@ -177,11 +208,22 @@
 							);
 						}
 					}
+					else
+					{
+						// Oops - something went wrong! Log an error message and restore the original image file.
+						error_log(print_r("resizeImageFile FAILED for" . $filename . " - the original image file has been restored.", true));
+						@unlink($filename);
+						@unlink($filename . '.temp');
+						rename($reiFilename, $filename);
+					}
+
+					// Give the current image file the same timestamp as the original image file.
+					touch($filename, $timestamp);
 				}
 			}
 			// End Automatic Attachment Rotation (and Resize) mod.]]></add>
 	</operation>
-	<operation>	<!-- line 1562 -->
+	<operation> <!-- line 1562 -->
 		<search position="after"><![CDATA[
 				// Only adjust dimensions on successful thumbnail creation.]]></search>
 		<add><![CDATA[else
@@ -191,7 +233,7 @@
 				$time = !empty($thumb_realname) && file_exists($thumb_realname) ? filemtime($thumb_realname) : false;
 ]]></add>
 	</operation>
-	<operation>	<!-- line 1574 -->
+	<operation> <!-- line 1574 -->
 		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_thumb'] . ';image']]></search>
 		<add><![CDATA[ . ';ts=' . $time]]></add>
 	</operation>
@@ -217,14 +259,14 @@
 </file>
 <file name="$sourcedir/ManageAttachments.php">
 	<!-- ManageAttachments function -->
-	<operation>	<!-- line 119 -->
+	<operation> <!-- line 119 -->
 		<search position="before"><![CDATA['attachpaths' => 'ManageAttachmentPaths',]]></search>
 		<add><![CDATA[
 		'resizebatch' => 'ResizeBatch',
 		'resizebrowse' => 'ResizeBrowse',
 		'resizeselect' => 'ResizeSelect',]]></add>
 	</operation>
-	<operation>	<!-- line 131 -->
+	<operation> <!-- line 131 -->
 		<search position="after"><![CDATA[// Pick the correct sub-action.]]></search>
 		<add><![CDATA[AutoRotation_AdminHook($subActions);
 	loadLanguage('AutoRotation');
@@ -237,7 +279,7 @@
 	</operation>
 
 	<!-- ManageAttachmentSettings function -->
-	<operation>	<!-- line 184 -->
+	<operation> <!-- line 184 -->
 		<search position="after"><![CDATA[			// Thumbnail settings.
 ]]></search>
 		<add><![CDATA[			// Added for automatic rotation of image attachments.
@@ -249,6 +291,7 @@
 			// Added for reformatting/resizing attachments.
 			array('check', 'attachment_image_reformat'),
 			array('check', 'attachment_resize_existing'),
+			array('check', 'attachment_resize_backup'),
 			array('int', 'attachment_jpeg_quality', 6),
 			array('int', 'attachment_image_width', 6),
 			array('int', 'attachment_image_height', 6),
@@ -257,14 +300,14 @@
 	</operation>
 
 	<!-- BrowseFiles function -->
-	<operation>	<!-- line 345 -->
+	<operation> <!-- line 345 -->
 		<search position="replace"><![CDATA[	$link .= sprintf(\'%1$s?action=dlattach;topic=%2$d.0;attach=%3$d\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_attach\']);]]></search>
 		<add><![CDATA[{
 							$time = filemtime(getAttachmentFilename($rowData[\'filename\'], $rowData[\'id_attach\'], $rowData[\'id_folder\'], false, $rowData[\'file_hash\']));
 							$link .= sprintf(\'%1$s?action=dlattach;topic=%2$d.0;attach=%3$d;ts=%4$d\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_attach\'], $time);
 						}]]></add>
 	</operation>
-	<operation>	<!-- line 447 -->
+	<operation> <!-- line 447 -->
 		<search position="after"><![CDATA['check' => array(]]></search>
 		<add><![CDATA['orientation' => array(
 				'header' => array(
@@ -290,12 +333,12 @@
 			),
 			]]></add>
 	</operation>
-	<operation>	<!-- line 473 -->
+	<operation> <!-- line 473 -->
 		<search position="after"><![CDATA[name="remove_submit"]]></search>
 		<add><![CDATA[name="rotate_submit" class="button_submit" value="' . $txt['img_rotate'] . '" onclick="return confirm(\'' . $txt['img_rotate_confirm'] . '\');" />
 							<input type="submit" ]]></add>
 	</operation>
-	<operation>	<!-- line 479 -->
+	<operation> <!-- line 479 -->
 		<search position="before"><![CDATA[// Create the list.]]></search>
 		<add><![CDATA[
 	if ($context['browse_type'] != 'attachments')
@@ -304,13 +347,13 @@
 	</operation>
 
 	<!-- list_getFiles function -->
-	<operation>	<!-- line 513 -->
+	<operation> <!-- line 513 -->
 		<search position="after"><![CDATA[a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board]]></search>
 		<add><![CDATA[a.id_folder, ]]></add>
 	</operation>
 
 	<!-- MaintainFiles function -->
-	<operation>	<!-- line 639 -->
+	<operation> <!-- line 639 -->
 		<search position="before"><![CDATA[$context['attachment_total_size'] = round($attachmentDirSize, 2);
 ]]></search>
 		<add><![CDATA[
@@ -319,14 +362,14 @@
 	</operation>
 
 	<!-- RemoveAttachment function -->
-	<operation>	<!-- line 768 -->
+	<operation> <!-- line 768 -->
 		<search position="before"><![CDATA[if (!empty($_POST['remove'])]]></search>
 		<add><![CDATA[ && isset($_POST['remove_submit'])]]></add>
 	</operation>
 </file>
 <file name="$sourcedir/PersonalMessage.php">
 	<!-- messagePostError function -->
-	<operation error="ignore">	<!-- line 2096 with PM Attachments installed -->
+	<operation error="ignore"> <!-- line 2096 with PM Attachments installed -->
 		<search position="before"><![CDATA[if (!is_uploaded_file($_FILES['attachment']['tmp_name'][$n]) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['attachment']['tmp_name'][$n])))
 					fatal_lang_error('attach_timeout', 'critical');]]></search>
 		<add><![CDATA[
@@ -337,7 +380,7 @@
 	</operation>
 
 	<!-- MessagePost2 function -->
-	<operation error="ignore">	<!-- line 2596 with PM Attachments installed -->
+	<operation error="ignore"> <!-- line 2596 with PM Attachments installed -->
 		<search position="after"><![CDATA[
 			// Check the total upload size for this post...
 ]]></search>
@@ -350,19 +393,19 @@
 </file>
 <file name="$sourcedir/Post.php">
 	<!-- Post function -->
-	<operation>	<!-- line 91 -->
+	<operation> <!-- line 91 -->
 		<search position="after"><![CDATA[
 	// You can't reply with a poll... hacker.]]></search>
 		<add><![CDATA[	loadLanguage('AutoRotation');
 ]]></add>
 	</operation>
-	<operation>	<!-- line 712 -->
+	<operation> <!-- line 712 -->
 		<search position="before"><![CDATA[,
 				m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
 				IFNULL(a.size, -1) AS filesize, a.filename, a.id_attach,]]></search>
 		<add><![CDATA[ a.width, a.height,]]></add>
 	</operation>
-	<operation>	<!-- line 777 -->
+	<operation> <!-- line 777 -->
 		<search position="before"><![CDATA[		// Load up 'em attachments!
 		foreach ($attachment_stuff as $attachment)
 		{
@@ -376,7 +419,7 @@
 					'height' => $attachment['height'],
 ]]></add>
 	</operation>
-	<operation>	<!-- line 985 -->
+	<operation> <!-- line 985 -->
 		<search position="before"><![CDATA[				if ($_FILES['attachment']['name'][$n] == '')
 					continue;
 ]]></search>
@@ -388,13 +431,13 @@
 	</operation>
 
 	<!-- Post2 function -->
-	<operation>	<!-- line 1271 -->
+	<operation> <!-- line 1271 -->
 		<search position="before"><![CDATA[require_once($sourcedir . '/Subs-Post.php');
 	loadLanguage('Post');]]></search>
 		<add><![CDATA[
 	loadLanguage('AutoRotation');]]></add>
 	</operation>
-	<operation>	<!-- line 1684 -->
+	<operation> <!-- line 1684 -->
 		<search position="after"><![CDATA[// ...or attach a new file...]]></search>
 		<add><![CDATA[// ...or rotate an existing attachment...
 	if (isset($_REQUEST['msg'], $_POST['orient']) && allowedTo('post_attachment'))
@@ -405,7 +448,7 @@
 
 	]]></add>
 	</operation>
-	<operation>	<!-- line 1763 -->
+	<operation> <!-- line 1763 -->
 		<search position="after"><![CDATA[			// Check the total upload size for this post...]]></search>
 		<add><![CDATA[				// Automatic Attachment Rotation (and Resize) alteration:
 				require_once($sourcedir . '/Subs-AutoRotation.php');
@@ -416,28 +459,28 @@
 </file>
 <file name="$sourcedir/Subs-Graphics.php">
 	<!-- resizeImageFile function -->
-	<operation>	<!-- line 309 -->
+	<operation> <!-- line 309 -->
 		<search position="before"><![CDATA[function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0]]></search>
 		<add><![CDATA[, $jpegQuality = 100]]></add>
 	</operation>
-	<operation>	<!-- line 374 -->
+	<operation> <!-- line 374 -->
 		<search position="before"><![CDATA[resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, true, $preferred_format]]></search>
 		<add><![CDATA[, $jpegQuality]]></add>
 	</operation>
 	
 	<!-- resizeImage function -->
-	<operation>	<!-- line 382 -->
+	<operation> <!-- line 382 -->
 		<search position="before"><![CDATA[function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0]]></search>
 		<add><![CDATA[, $jpegQuality = 100]]></add>
 	</operation>
-	<operation>	<!-- line 443 -->
+	<operation> <!-- line 443 -->
 		<search position="before"><![CDATA[$success = imagejpeg($dst_img, $destName]]></search>
 		<add><![CDATA[, min($jpegQuality, 100)]]></add>
 	</operation>
 </file>
 <file name="$sourcedir/Subs-PMAttachmentsAdmin.php" error="skip">
 	<!-- ManagePMAttachmentSettings function -->
-	<operation error="ignore">	<!-- line 117 -->
+	<operation error="ignore"> <!-- line 117 -->
 		<search position="after"><![CDATA[			// Thumbnail settings.
 ]]></search>
 		<add><![CDATA[			// Added for resizing PM attachments.
@@ -451,7 +494,7 @@
 </file>
 <file name="$sourcedir/Subs-Post.php">
 	<!-- createAttachment function -->
-	<operation>	<!-- line 2192 -->
+	<operation> <!-- line 2192 -->
 		<search position="after"><![CDATA[	if (!$file_restricted || $already_uploaded)
 ]]></search>
 		<add><![CDATA[		// If the file format/mime type changed during reencoding update the database.
@@ -525,7 +568,7 @@
 		</div>
 ]]></add>
 	</operation>
-	<operation>	<!-- line 123 -->
+	<operation> <!-- line 123 -->
 		<search position="before"><![CDATA[<input type="hidden" name="type" value="avatars" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="sa" value="byAge" />]]></search>
@@ -578,7 +621,7 @@
 						</dd>';
 		}]]></add>
 	</operation>
-	<operation error="ignore"> <!-- Line 448 - code change when 'Post and PM Inline Attachments' mod prior to v6.11 is installed -->
+	<operation error="ignore"> <!-- Line 448 - code change when 'Post and PM Inline Attachments' mod v6.10 or ealier is installed -->
 		<search position="replace"><![CDATA[foreach ($context['current_attachments'] as $attid => $attachment)
 			echo '
 						<dd class="smalltext">
@@ -611,7 +654,7 @@
 						</dd>';
 		}]]></add>
 	</operation>
-	<operation error="ignore"> <!-- Line 448 - code change when 'Post and PM Inline Attachments' mod v6.11 and later is installed -->
+	<operation error="ignore"> <!-- Line 448 - code change when 'Post and PM Inline Attachments' mod v6.11 or later is installed -->
 		<search position="replace"><![CDATA[foreach ($context['current_attachments'] as $attid => $attachment)
 			echo '
 						<dd class="smalltext">
