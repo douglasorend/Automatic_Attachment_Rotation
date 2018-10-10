@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+<id>Dougiefresh:AutoRotation</id>
+<name>Automatic Attachment Rotation</name>
+<version>1.1</version>
+
+<file name="$sourcedir/Display.php">
+	<!-- Display function -->
+	<operation>
+		<search position="after"><![CDATA[// Fetch attachments.]]></search>
+		<add><![CDATA[require_once($sourcedir . '/Subs-AutoRotation.php');
+
+		]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,]]></search>
+		<add><![CDATA[
+					a.proper_rotation AS img_rotation, thumb.proper_rotation AS thumb_rotation, thumb.fileext as thumb_ext, a.fileext as file_ext,]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[$temp[$row['id_attach']] = $row;]]></search>
+		<add><![CDATA[$temp[$row['id_attach']] = AutoRotation_Display($row);]]></add>
+	</operation>
+
+	<!-- Download function -->
+	<operation>
+		<search position="before"><![CDATA[global $txt, $modSettings, $user_info, $scripturl, $context, $sourcedir, $topic, $smcFunc]]></search>
+		<add><![CDATA[, $sourcedir]]></add>
+	</operation>
+	<operation>
+		<search positon="before"><![CDATA[// Some defaults that we need.]]></search>
+		<add><![CDATA[require_once($sourcedir . '/Subs-AutoRotation.php');
+	
+	]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, id_member]]></search>
+		<add><![CDATA[, proper_rotation]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member]]></search>
+		<add><![CDATA[, a.proper_rotation]]></add>
+	</operation>
+	<operation>
+		<search position="replace"><![CDATA[$is_approved, $id_member) = $smcFunc['db_fetch_row']($request);]]></search>
+		<add><![CDATA[$is_approved, $id_member, $proper_rotation) = $smcFunc['db_fetch_row']($request);]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[$filename = getAttachmentFilename($real_filename, $_REQUEST['attach'], $id_folder, false, $file_hash);]]></search>
+		<add><![CDATA[
+	if (!$proper_rotation && (isset($_REQUEST['type']) && $_REQUEST['type'] != 'avatar'))
+		AutoRotation_Download($filename, $file_ext, $_REQUEST['attach'], $attachment_type);]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Subs-Graphics.php">
+	<!-- resizeImageFile function -->
+	<operation>
+		<search position="before"><![CDATA[require_once($sourcedir . '/Subs-Package.php');]]></search>
+		<add><![CDATA[
+	require_once($sourcedir . '/Subs-AutoRotation.php');]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[$sizes = @getimagesize($destination);]]></search>
+		<add><![CDATA[
+		$src_format = isset($sizes[2]) && isset($default_formats[$sizes[2]]) ? $default_formats[$sizes[2]] : false;
+		AutoRotation_Check($filename, $file_ext, $_REQUEST['attach'], $attachment_type);]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA[$sizes = @getimagesize($source);]]></search>
+		<add><![CDATA[
+		$src_format = isset($sizes[2]) && isset($default_formats[$sizes[2]]) ? $default_formats[$sizes[2]] : false;
+		AutoRotation_Process($source, $src_format, $sizes, $preferred_format);]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Subs-Post.php">
+	<operation>
+		<search position="before"><![CDATA[UPDATE {db_prefix}attachments
+			SET id_msg = {int:id_msg}]]></search>
+		<add><![CDATA[, proper_rotation = 1]]></add>
+	</operation>
+</file>
+</modification>

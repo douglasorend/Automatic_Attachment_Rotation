@@ -1,2 +1,9 @@
+v1.1 - March 14th, 2016
+o Fixed several errors within the [b]image_rotate_flip[/b] function.
+o Added code to rotate/flip attachments upon download if they haven't been processed yet.
+o Added code to rotate/flip attachments upon displaying topics if they haven't been processed yet.
+o Branched [b]image_rotate_flip[/b] function as [b]AutoRotation_Process[/b] into [b]Subs-AutoRotation.php[/b] file.
+o Seperated SMF 2.0.x and SMF 2.1 install branches.
+
 v1.0 - February 24th, 2016
 o Initial release to the public
