@@ -209,18 +209,13 @@ function ResizeBrowse()
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
-						global $modSettings, $context, $scripturl;
-
+						global $scripturl;
 						$link = \'<a href="\';
-						$link .= sprintf(\'%1$s?action=dlattach;topic=%2$d.0&id=%3$d\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_attach\']);
+						$time = filemtime(getAttachmentFilename($rowData[\'filename\'], $rowData[\'id_attach\'], $rowData[\'id_folder\'], false, $rowData[\'file_hash\']));
+						$link .= sprintf(\'%1$s?action=dlattach;topic=%2$d.0;attach=%3$d;ts=%4$d\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_attach\'], $time);
 						$link .= \'"\';
-
-						// Show a popup on click if it\'s a picture and we know its dimensions
-						if (!empty($rowData[\'width\']) && !empty($rowData[\'height\']))
-							$link .= sprintf(\' onclick="return reqWin(this.href\' . \' + \\\';image\\\'\' . \', %1$d, %2$d, true);"\', $rowData[\'width\'] + 20, $rowData[\'height\'] + 20);
-
+						$link .= sprintf(\' onclick="return reqWin(this.href\' . ($rowData[\'attachment_type\'] == 1 ? \'\' : \' + \\\';image\\\'\') . \', %1$d, %2$d, true);"\', $rowData[\'width\'] + 20, $rowData[\'height\'] + 20);
 						$link .= sprintf(\'>%1$s</a>\', preg_replace(\'~&amp;#(\\\\d{1,7}|x[0-9a-fA-F]{1,6});~\', \'&#\\\\1;\', htmlspecialchars($rowData[\'filename\'])));
-
 						return $link;
 					'),
 				),
@@ -250,7 +245,6 @@ function ResizeBrowse()
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
-						global $txt;
 						return $rowData[\'width\'];
 					'),
 				),
@@ -265,7 +259,6 @@ function ResizeBrowse()
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
-						global $txt;
 						return $rowData[\'height\'];
 					'),
 				),
@@ -280,7 +273,6 @@ function ResizeBrowse()
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
-						global $txt;
 						return $rowData[\'jpeg_quality\'];
 					'),
 				),
@@ -295,8 +287,9 @@ function ResizeBrowse()
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
-						global $txt, $scripturl;
-						return sprintf(\'%1$s <a href="%2$s?topic=%3$d.0.msg%4$d#msg%4$d">%5$s</a>\', $txt[\'in\'], $scripturl, $rowData[\'id_topic\'], $rowData[\'id_msg\'], $rowData[\'subject\']);
+						global $scripturl;
+						$post = sprintf(\'<a href="%1$s?topic=%2$d.msg%3$d#msg%3$d">%4$s</a>\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_msg\'], $rowData[\'subject\']);
+						return $post;
 					'),
 				),
 				'sort' => array(
@@ -310,9 +303,7 @@ function ResizeBrowse()
 				),
 				'data' => array(
 					'function' => create_function('$rowData', '
-						global $txt, $context, $scripturl;
-
-						// The date the message containing the image was posted
+						global $txt;
 						$date = empty($rowData[\'poster_time\']) ? $txt[\'never\'] : timeformat($rowData[\'poster_time\']);
 						return $date;
 					'),

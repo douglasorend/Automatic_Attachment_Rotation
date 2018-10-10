@@ -1,5 +1,9 @@
+V5.2 - April 28th, 2018
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970435#msg3970435]@rjen[/url] - fixed image and post links for images in Browse files > Resize Existing Images list.
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970435#msg3970435]@rjen[/url] - added Dutch language files.
+
 V5.1 - April 28th, 2018
-o Per [url=https://www.simplemachines.org/community/index.php?topic=525705.msg3970385#msg3970385]@rjen[/url] - fixed issue that prevented inline attachment numbers from being incremented when modifying a post.
+o Per [url=https://www.simplemachines.org/community/index.php?topic=525705.msg3970385#msg3970385]@rjen[/url] - fixed issue that prevented [url=https://custom.simplemachines.org/mods/index.php?mod=3770]Post and PM Inline Attachment[/url] inline attachment numbers from being incremented when modifying a post.
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970388#msg3970388]@rjen[/url] - fixed issues with sorting and browsing list of images to be resized/reformatted.
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970392#msg3970392]@rjen[/url] - load required language file rather than add text strings to other language files.
 
