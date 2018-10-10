@@ -574,7 +574,7 @@ function AutoRotation_Inbound($index, $pm = false)
 					$image = @imagecreatefromjpeg($filename);
 
 					// Rotate JPEG image according to Exif orientation.
-					if (isset($imageExif['Orientation']) || array_key_exists('Orientation', $imageExif))
+					if ($imageSize['mime'] == 'image/jpeg' && (isset($imageExif['Orientation']) || array_key_exists('Orientation', $imageExif)))
 					{
 						$imageOrientation = $imageExif['Orientation'];
 						switch($imageOrientation)
