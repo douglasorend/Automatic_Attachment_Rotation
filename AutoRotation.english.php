@@ -36,6 +36,7 @@ $txt['attachment_resize_backup'] = 'Keep backup of original image file when resi
 $txt['attachment_jpeg_quality'] = 'JPEG quality factor<div class="smalltext">(Maximum 100, default 100)</div>';
 $txt['attachment_image_width'] = 'Maximum width of attached images<div class="smalltext">(0 for no maximum width)</div>';
 $txt['attachment_image_height'] = 'Maximum height of attached images<div class="smalltext">(0 for no maximum height)</div>';
+$txt['attachment_image_reencode'] = 'Re-encode potentially dangerous image attachments.<div class="smalltext">Note: Automatic image rotation will NOT work if this option is checked.</div>';
 
 $txt['pm_attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG';
 $txt['pm_attachment_jpeg_quality'] = 'JPEG quality factor<div class="smalltext">(Maximum 100, default 100)</div>';

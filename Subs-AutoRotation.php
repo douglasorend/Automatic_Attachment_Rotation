@@ -47,7 +47,7 @@ function AutoRotation_GetOrientation($filename)
 //==============================================================================
 // Function dealing with Auto-Rotation of attachments:
 //==============================================================================
-function AutoRotation_Process($filename, $orientation = false)
+function AutoRotation_Process($filename, $orientation = false, $jpegQuality = 100)
 {
 	global $context, $modSettings;
 	static $default_formats = array(
@@ -163,7 +163,7 @@ function AutoRotation_Process($filename, $orientation = false)
 		if (function_exists($func = 'image' . $format))
 			$success = @$func($src_img, $filename);
 		else
-			$success = imagejpeg($src_img, $filename);
+			$success = imagejpeg($src_img, $filename, $jpegQuality);
 	}
 	if (is_resource($src_img))
 		imagedestroy($src_img);
@@ -218,18 +218,22 @@ function AutoRotation_Download($img_name, $id_thumb, $img_type)
 //==============================================================================
 // Support functions:
 //==============================================================================
-function AutoRotation_Update($id_attach, $width = 0, $height = 0, $orientation = 1)
+function AutoRotation_Update($id_attach, $width = 0, $height = 0, $orientation = 1, $jpegQuality = 100)
 {
 	global $smcFunc;
 	$smcFunc['db_query']('', '
 		UPDATE {db_prefix}attachments
-		SET proper_rotation = {int:rotated}' . (!empty($width) ? ', width = {int:width}' : '') . (!empty($height) ? ', height = {int:height}' : '') . '
+		SET proper_rotation = {int:rotated}' .
+			(!empty($width) ? ', width = {int:width}' : '') .
+			(!empty($height) ? ', height = {int:height}' : '') .
+			(!empty($jpegQuality) ? ', jpeg_quality = {int:jpeg_quality}' : '') . '
 		WHERE id_attach = {int:id_attach}',
 		array(
 			'id_attach' => (int) $id_attach,
 			'rotated' => max(1, (int) $orientation),
 			'width' => (int) $width,
-			'height' => (int) $height
+			'height' => (int) $height,
+			'jpeg_quality' => (int) $jpegQuality
 		)
 	);
 }
@@ -239,7 +243,7 @@ function AutoRotation_Update($id_attach, $width = 0, $height = 0, $orientation =
 //==============================================================================
 function AutoRotation_Display($row)
 {
-	global $smcFunc;
+	global $smcFunc, $modSettings;
 
 	// Is this an image OR has already been processed?  Abort if not:
 	if (empty($row['width']) || empty($row['height']) || !empty($row['img_rotation']))
@@ -249,7 +253,8 @@ function AutoRotation_Display($row)
 	$img = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
 	$orientation = AutoRotation_Process($img);
 	$size = @getimagesize($img);
-	AutoRotation_Update($row['id_attach'], $row['width'] = $size[0], $row['height'] = $size[1], $orientation);
+	$jpegQuality = min($row['jpeg_quality'], empty($modSettings['attachment_jpeg_quality']) ? 100 : $modSettings['attachment_jpeg_quality']);
+	AutoRotation_Update($row['id_attach'], $row['width'] = $size[0], $row['height'] = $size[1], $orientation, $jpegQuality);
 
 	// If there is a thumbnail that needs rotating, then let's rotate the thumbnail:
 	if (!empty($row['thumb_id']) && $orientation > 1)
@@ -408,7 +413,7 @@ function AutoRotation_AdminHook(&$subActions)
 
 function AutoRotation_Rotate()
 {
-	global $smcFunc, $context;
+	global $smcFunc, $context, $modSettings;
 
 	// First, let's make sure that the session is valid!!!
 	checkSession('post');
@@ -424,7 +429,7 @@ function AutoRotation_Rotate()
 		// This is a thumbnail!  Drats...  Gotta find the original and process it, too.... :(
 		$request = $smcFunc['db_query']('', '
 			SELECT
-				a.id_attach, a.id_folder, a.file_hash, a.filename, t.id_attach AS thumb_id,
+				a.id_attach, a.id_folder, a.file_hash, a.filename, a.jpeg_quality, t.id_attach AS thumb_id,
 				t.id_folder AS thumb_folder, t.file_hash AS thumb_hash, t.filename AS thumb_name
 			FROM {db_prefix}attachments AS a
 				LEFT JOIN {db_prefix}attachments AS t ON (t.id_attach = a.id_thumb)
@@ -443,9 +448,10 @@ function AutoRotation_Rotate()
 
 			// Let's process this image properly now, then update the database:
 			$img = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
-			AutoRotation_Process($img, $orientation = $attach[$row['id_attach']]);
+			$jpegQuality = min($row['jpeg_quality'], empty($modSettings['attachment_jpeg_quality']) ? 100 : $modSettings['attachment_jpeg_quality']);
+			AutoRotation_Process($img, $orientation = $attach[$row['id_attach']], $jpegQuality);
 			$size = @getimagesize($img);
-			AutoRotation_Update($row['id_attach'], $size[0], $size[1], $orientation);
+			AutoRotation_Update($row['id_attach'], $size[0], $size[1], $orientation, $jpegQuality);
 
 			// Also process the thumbnail (if available):
 			if (!empty($row['thumb_id']))
@@ -549,7 +555,7 @@ function AutoRotation_Inbound($index, $pm = false)
 	// Resize/reformat image and rotate it if necessary.
 	if (list ($width, $height, $type) = @getimagesize($filename))
 	{
-		if ((AutoRotation_Aspect($width, $height, $pre) || empty($sizeLimit)))
+		if (AutoRotation_Aspect($width, $height, $pre) || empty($sizeLimit) || $jpegQuality != 100)
 		{
 			// If the image should be reformatted to JPEG.
 			// Note: By default BMP images are reformatted to JPEG by resizeImageFile().

@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation (and Resize)</name>
-<version>5.4</version>
+<version>5.5</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -15,7 +15,7 @@
 	</operation>
 	<operation> <!-- line 942 -->
 		<search position="after"><![CDATA[a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',]]></search>
-		<add><![CDATA[a.proper_rotation AS img_rotation, ]]></add>
+		<add><![CDATA[a.proper_rotation AS img_rotation, a.jpeg_quality, ]]></add>
 	</operation>
 	<operation> <!-- line 943 -->
 		<search position="before"><![CDATA[IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
@@ -105,7 +105,7 @@
 					$preferred_format = $type;
 
 				// Find out the image JPEG quality and the maximum JPEG quality.
-				$jpegQuality = $jpegQuality = $attachmentData[$i]['jpeg_quality'];
+				$jpegQuality = $attachmentData[$i]['jpeg_quality'];
 				$max_jpegQuality = min(100, empty($modSettings['attachment_jpeg_quality']) ? 100 : $modSettings['attachment_jpeg_quality']);
 
 				// If the image needs to be resized, saved with a lower JPEG quality,

@@ -1,3 +1,8 @@
+V5.5 - May 7th, 2018
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970888#msg3970888]Rock Lee[/url] - updated/added Spanish langage files.
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3971411#msg3971411]The QE2 Story Forum[/url] and [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3971413#msg3971413]Tonyvic[/url] - added note about [i]"Attachment Settings => Re-encode potentially dangerous image attachments"[/i] setting in relation to this mod.
+o Resolved issue where correct JPEG Quality value was not always being stored in database.
+
 V5.4 - May 1st, 2018
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970720#msg3970720]@rjen[/url] - updated Dutch language files.
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970759#msg3970759]Rock Lee[/url] - fixed text formatting error for [i]attachmentsPreREI[/i] directory name text string in language files and updated help text/description relating to the saving of original image files to the [i]attachmentsPreREI[/i] directory.

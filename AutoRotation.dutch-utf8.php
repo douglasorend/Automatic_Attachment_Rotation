@@ -36,6 +36,7 @@ $txt['attachment_resize_backup'] = 'Sla een backup op van het originele afbeeldi
 $txt['attachment_jpeg_quality'] = 'JPEG kwaliteits factor<div class="smalltext">(Maximaal 100, standaard 100)</div>';
 $txt['attachment_image_width'] = 'Maximale breedte van afbeeldingen in bijlage<div class="smalltext">(0 voor geen maximum)</div>';
 $txt['attachment_image_height'] = 'Maximale hoogte van afbeeldingen in bijlage<div class="smalltext">(0 voor geen maximum)</div>';
+$txt['attachment_image_reencode'] = 'Re-codeer mogelijk gevaarlijke afbeeldingsbijlagen opnieuw.<div class="smalltext">Opmerking: Automatische beeldrotatie werkt NIET als deze optie is aangevinkt.</div>';
 
 $txt['pm_attachment_image_reformat'] = 'Niet-JPEG afbeeldingen omzetten naar JPEG';
 $txt['pm_attachment_jpeg_quality'] = 'JPEG kwaliteits factor<div class="smalltext">(Maximaal 100, standaard 100)</div>';
