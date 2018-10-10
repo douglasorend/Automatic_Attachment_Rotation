@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>3.8</version>
+<version>3.9</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->

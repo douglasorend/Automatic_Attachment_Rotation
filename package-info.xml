@@ -5,7 +5,7 @@
 	<id>Dougiefresh:AutoRotation</id>
 	<name>Automatic Attachment Rotation</name>
 	<type>modification</type>
-	<version>3.8</version>
+	<version>3.9</version>
 
 	<install for="2.0 - 2.0.99">
 		<readme parsebbc="true">readme.txt</readme>
@@ -15,6 +15,8 @@
 		<require-file name="Class-exifReader.php" destination="$sourcedir" />
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
 		<require-file name="AutoRotation.english.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="AutoRotation.spanish_latin.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="AutoRotation.spanish_latin-utf8.php" destination="$boarddir/Themes/default/languages" />
 	</install>
 	<uninstall for="2.0 - 2.0.99">
 		<code>add_remove_hooks.php</code>
@@ -22,6 +24,8 @@
 		<remove-file name="$sourcedir/Class-exifReader.php" />		
 		<remove-file name="$sourcedir/Subs-AutoRotation.php" />		
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english.php" />
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin.php" />
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin-utf8.php" />
 	</uninstall>
 
 	<install for="2.1 Beta 2">
@@ -32,6 +36,8 @@
 		<require-file name="Class-exifReader.php" destination="$sourcedir" />
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
 		<require-file name="AutoRotation.english.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="AutoRotation.spanish_latin.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="AutoRotation.spanish_latin-utf8.php" destination="$boarddir/Themes/default/languages" />
 	</install>
 	<uninstall for="2.1 Beta 2">
 		<code>add_remove_hooks.php</code>
@@ -39,5 +45,7 @@
 		<remove-file name="$sourcedir/Class-exifReader.php" />		
 		<remove-file name="$sourcedir/Subs-AutoRotation.php" />		
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english.php" />
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin.php" />
+		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin-utf8.php" />
 	</uninstall>
 </package-info>

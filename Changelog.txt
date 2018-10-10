@@ -1,3 +1,8 @@
+v3.9 - February 13th, 2018
+o Updated Spanish Latin translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=322597]Rock Lee[/url].
+o Added translators section to [b]README.txt[/b].
+o Added [b]LICENSE.txt[/b] to satisfy licensing concerns.
+
 v3.8 - October 9th, 2017
 o Fixed syntax error in code that builds the attachment link.
 
