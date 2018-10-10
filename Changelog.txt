@@ -1,4 +1,9 @@
-v3.0 - Unpublished
+v3.1 - October 31th, 2016
+o Fixed missing array element errors when trying to get thumbnail attachment timestamp.
+o Fixed issue where errors where generated because no filename was given to [b]filemtime[/b].
+o Fixed [b]LoadLanguage[/b] operation so that it does not rely on the global declaration.
+
+v3.0 - October 15th, 2016
 o Added code to the post editing template to manually rotate images.
 o Added code to include timestamps on thumbnail URLs to circumvent browser caching.
 o Fixed rotation code to get image format instead of relying on database information.

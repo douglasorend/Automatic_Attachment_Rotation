@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>3.0</version>
+<version>3.1</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -70,14 +70,14 @@
 		<add><![CDATA[;ts=' . $time . ']]></add>
 	</operation>
 	<operation>
-		<search position="after"><![CDATA[// Only adjust dimensions on successful thumbnail creation.]]></search>
+		<search position="after"><![CDATA[
+				// Only adjust dimensions on successful thumbnail creation.]]></search>
 		<add><![CDATA[else
 					$thumb_realname = getAttachmentFilename($attachment['thumb_name'], $attachment['id_thumb'], $attachment['thumb_folder'], false, $attachment['thumb_hash']);
 					
 				// Get timestamp for thumbnail image:
-				$time = filemtime($thumb_realname);
-
-				]]></add>
+				$time = !empty($thumb_realname) && file_exists($thumb_realname) ? filemtime($thumb_realname) : false;
+]]></add>
 	</operation>
 	<operation>
 		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_thumb'] . ';image']]></search>
