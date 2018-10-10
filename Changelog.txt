@@ -1,3 +1,6 @@
+v3.6 - September 8th, 2017
+o Fixed 2 syntax errors in [b]Subs-AutoRotation.php[/b].
+
 v3.5 - September 4th, 2017
 o Added support for SMF 2.1 Beta 3.
 o Removed support for SMF 2.1 Beta 2.

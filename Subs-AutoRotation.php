@@ -87,7 +87,7 @@ function AutoRotation_Process($filename, $orientation = false)
 		$memoryNeeded = ceil($width * $height * $info['bits'] * $info['channels'] / 8 * 2);
 		$currentMemory = memory_get_usage() + $memoryNeeded;
 		$memoryLimit = ini_get('memory_limit');
-		$memoryRequested = (int) $memoryLimit + ceil(($currentMemory - $memoryLimit * pow(1024, 2)) / pow(1024, 2)));
+		$memoryRequested = (int) $memoryLimit + ceil(($currentMemory - $memoryLimit * pow(1024, 2)) / pow(1024, 2));
 		
 		// Do we have enough memory?  If not, try to allocate enough:
 		if ($currentMemory > (integer) ini_get('memory_limit') * pow(1024, 2))
@@ -305,7 +305,7 @@ if (!function_exists('imageflip'))
 //==============================================================================
 if (!function_exists('imagerotate'))
 {
-	function imagerotate($src_img, $angle, $bgd_color = 0, $ignore_transparent = 0 ])
+	function imagerotate($src_img, $angle, $bgd_color = 0, $ignore_transparent = 0)
 	{
 		$src_x = imagesx($src_img);
 		$src_y = imagesy($src_img);
