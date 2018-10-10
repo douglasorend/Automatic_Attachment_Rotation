@@ -850,7 +850,7 @@ class phpExifReader {
                 case TAG_SHUTTERSPEED:
                     // More complicated way of expressing exposure time, so only use
                     // this value if we don't already have it from somewhere else.
-                    if ($this->ImageInfo[TAG_EXPOSURETIME] == 0){
+                    if (isset($this->ImageInfo[TAG_EXPOSURETIME]) && $this->ImageInfo[TAG_EXPOSURETIME] == 0){
                         $sp = $this->ConvertAnyFormat($ValuePtr, $Format);
                         $this->ImageInfo[TAG_SHUTTERSPEED] = (1/exp($sp[0]*log(2)));
                     }

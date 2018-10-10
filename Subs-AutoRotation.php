@@ -29,7 +29,10 @@ function AutoRotation_GetOrientation($filename)
 	{
 		// FASTER: Find this with native code if native function already exists...
 		$exif = @exif_read_data($filename);
-		return isset($exif['IFD0']['Orientation']) ? $exif['IFD0']['Orientation'] : 0;
+		if (isset($exif['IFD0']['Orientation']))
+			return $exif['IFD0']['Orientation'];
+		elseif (isset($exif['Orientation']))
+			return $exif['Orientation'];
 	}
 	else
 	{
