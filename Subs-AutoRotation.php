@@ -190,7 +190,7 @@ function AutoRotation_Display($row)
 	}
 
 	// Check if thumbnail image has been processed for auto-rotation:
-	if (empty($row['thumb_rotation']))
+	if (isset(($row['thumb_rotation'])) && empty($row['thumb_rotation']))
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT thumb.id_folder, thumb.filename, thumb.file_hash, thumb.fileext, thumb.id_attach, thumb.attachment_type
@@ -325,9 +325,8 @@ function AutoRotation_Rotate()
 		// This is a thumbnail!  Drats...  Gotta find the original and process it, too.... :(
 		$request = $smcFunc['db_query']('', '
 			SELECT 
-				a.id_attach, a.id_folder, a.file_hash, t.id_attach AS thumb_id, a.filename, 
-				a.fileext, t.id_folder AS thumb_folder, t.file_hash AS thumb_hash, 
-				t.fileext as thumb_ext, t.filename AS thumb_name
+				a.id_attach, a.id_folder, a.file_hash, t.id_attach AS thumb_id, a.filename, a.fileext,
+				t.id_folder AS thumb_folder, t.file_hash AS thumb_hash, t.fileext as thumb_ext, t.filename AS thumb_name
 			FROM {db_prefix}attachments AS a
 				LEFT JOIN {db_prefix}attachments AS t ON (t.id_attach = a.id_thumb)
 			WHERE a.id_attach IN ({array_int:message_list})',

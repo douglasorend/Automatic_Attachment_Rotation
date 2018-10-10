@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>2.0</version>
+<version>2.1</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -14,9 +14,9 @@
 		]]></add>
 	</operation>
 	<operation>
-		<search position="before"><![CDATA[a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,]]></search>
-		<add><![CDATA[
-					a.proper_rotation AS img_rotation, thumb.proper_rotation AS thumb_rotation, thumb.fileext as thumb_ext, a.fileext as file_ext,]]></add>
+		<search position="before"><![CDATA[IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
+		<add><![CDATA[,
+					a.proper_rotation AS img_rotation, thumb.proper_rotation AS thumb_rotation, thumb.fileext as thumb_ext, a.fileext as file_ext]]></add>
 	</operation>
 	<operation>
 		<search position="replace"><![CDATA[$temp[$row['id_attach']] = $row;]]></search>
