@@ -190,7 +190,7 @@ function AutoRotation_Display($row)
 	}
 
 	// Check if thumbnail image has been processed for auto-rotation:
-	if (isset(($row['thumb_rotation'])) && empty($row['thumb_rotation']))
+	if (isset($row['thumb_rotation']) && empty($row['thumb_rotation']))
 	{
 		$request = $smcFunc['db_query']('', '
 			SELECT thumb.id_folder, thumb.filename, thumb.file_hash, thumb.fileext, thumb.id_attach, thumb.attachment_type
@@ -350,7 +350,7 @@ function AutoRotation_Rotate()
 				$img = getAttachmentFilename($row['thumb_name'], $row['thumb_attach'], $row['thumb_folder'], false, $row['thumb_hash']);
 				$orientation = AutoRotation_Process($img, $row['thumb_ext'], $format, $tmp[$row['thumb_id']]);
 				$size = @getimagesize($img);
-				AutoRotation_Update($row['thumb_attach'], $size[0], $size[1], $orientation);
+				AutoRotation_Update($row['thumb_id'], $size[0], $size[1], $orientation);
 			}
 		}
 	}

@@ -5,10 +5,11 @@
 	<id>Dougiefresh:AutoRotation</id>
 	<name>Automatic Attachment Rotation</name>
 	<type>modification</type>
-	<version>2.1</version>
+	<version>2.2</version>
 
 	<install for="2.0 - 2.0.99">
 		<readme parsebbc="true">readme.txt</readme>
+		<code>add_remove_hooks.php</code>
 		<database>db_install.php</database>
 		<modification>install_20x.xml</modification>
 		<modification>language_english.xml</modification>
@@ -16,6 +17,7 @@
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
 	</install>
 	<uninstall for="2.0 - 2.0.99">
+		<code>add_remove_hooks.php</code>
 		<modification reverse="true">install_20x.xml</modification>
 		<modification reverse="true">language_english.xml</modification>
 		<remove-file name="$sourcedir/Class-exifReader.php" />		
@@ -24,6 +26,7 @@
 
 	<install for="2.1 Beta 2">
 		<readme parsebbc="true">readme.txt</readme>
+		<code>add_remove_hooks.php</code>
 		<database>db_install.php</database>
 		<modification>install_21x.xml</modification>
 		<modification>language_english.xml</modification>
@@ -31,6 +34,7 @@
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
 	</install>
 	<uninstall for="2.1 Beta 2">
+		<code>add_remove_hooks.php</code>
 		<modification reverse="true">install_21x.xml</modification>
 		<modification reverse="true">language_english.xml</modification>
 		<remove-file name="$sourcedir/Class-exifReader.php" />		

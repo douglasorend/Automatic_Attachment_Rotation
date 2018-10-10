@@ -1,3 +1,9 @@
+v2.2 - September 20th, 2016
+o Fixed syntax error found in [b]Subs-AutoRotation.php[/b].  Thanks, [url=http://www.simplemachines.org/community/index.php?action=profile;u=387324]kungfujoe[/url]!
+o Fixed issue in the attachment screen, where attachment IDs were not being sent correctly.
+o Fixed undefined index error in [b]Subs-AutoRotation.php[/b].
+o Added forgotten package instruction to run [b]add_remove_hooks.php[/b] during package operations.
+
 v2.1 - September 20th, 2016
 o Fixed unknown column error in [b]Display.php[/b] that occurs when thumbnails are disabled.
 
