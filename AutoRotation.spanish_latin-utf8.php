@@ -11,6 +11,7 @@
 ***********************************************************************************
 * Spanish translation by Rock Lee (https://www.bombercode.org) Copyright 2014-2018*
 ***********************************************************************************/
+//$txt['img_rotate_confirm'] = 'Are you sure you want to apply the image rotate/flip changes?';
 $txt['img_orientation'] = 'Girar / Voltear';
 $txt['img_orientation1'] = 'Ning&uacute;n cambio';
 $txt['img_orientation2'] = 'Flip horizontal';

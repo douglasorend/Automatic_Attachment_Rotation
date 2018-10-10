@@ -10,6 +10,7 @@
 * or FITNESS FOR A PARTICULAR PURPOSE.											  *
 **********************************************************************************/
 
+//$txt['img_rotate_confirm'] = 'Are you sure you want to apply the image rotate/flip changes?';
 $txt['img_orientation'] = 'Draai/Spiegel';
 $txt['img_orientation1'] = 'Geen wijziging';
 $txt['img_orientation2'] = 'Spiegel horizontaal';

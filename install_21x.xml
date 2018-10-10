@@ -115,8 +115,9 @@
 			]]></add>
 	</operation>
 	<operation>	<!-- line 473 -->
-		<search position="after"><![CDATA[$txt['quickmod_delete_selected'] . ]]></search>
-		<add><![CDATA[$txt['img_rotate'] . ' &amp; ' . ]]></add>
+		<search position="after"><![CDATA[name="remove_submit"]]></search>
+		<add><![CDATA[$txt[name="rotate_submit" class="button_submit" value="' . $txt['img_rotate'] . '" onclick="return confirm(\'' . $txt['img_rotate_confirm'] . '\');" />
+							<input type="submit" ]]></add>
 	</operation>
 	<operation>	<!-- line 479 -->
 		<search position="before"><![CDATA[// Create the list.]]></search>
@@ -273,10 +274,10 @@
 				// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
 				// or attachment image width/height values are set and it's too wide/high,
 				// or it's not a BMP image and it's too large ...
-				$sizeLimit = !empty($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] * 1024 : 0;
-				if ($type == 6 || ($type != 2 && !empty($modSettings[$pre . 'attachment_image_reformat']))
-					|| (!empty($modSettings[$pre . 'attachment_image_width']) && $width > $modSettings[$pre . 'attachment_image_width'])
-					|| (!empty($modSettings[$pre . 'attachment_image_height']) && $height > $modSettings[$pre . 'attachment_image_height'])
+				$sizeLimit = !empty($modSettings['attachmentSizeLimit']) ? max(0, $modSettings['attachmentSizeLimit']) * 1024 : 0;
+				if ($type == 6 || ($type != 2 && $modSettings['attachment_image_reformat'])
+					|| (!empty($modSettings['attachment_image_width']) && $modSettings['attachment_image_width'] > 0 && $width > $modSettings['attachment_image_width'])
+					|| (!empty($modSettings['attachment_image_height']) && $modSettings['attachment_image_height'] > 0 && $height > $modSettings['attachment_image_height'])
 					|| ($type != 6 && !empty($sizeLimit) && $_FILES['attachment']['size'][$index] > $sizeLimit))
 				{
 					// What size will we make this image?

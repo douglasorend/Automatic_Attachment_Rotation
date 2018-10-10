@@ -79,7 +79,28 @@ function AutoRotation_Process($filename, $orientation = false)
 		return 1;
 
 	// Let's attempt to allocate enough memory for this:
-	if (function_exists('memory_get_usage'))
+	if (!empty($modSettings['ipmemlimit']) && $modSettings['ipmemlimit'] > 0)
+	{
+		// Image Processing Memory Limit
+		// Do we know the bit depth?
+		if (!empty($sizes['bits']) && !empty($sizes['channels']))
+			$bitDepth = $sizes['bits'] * $sizes['channels'];
+		else
+			$bitDepth = 96; // Probally a bad idea assuming, was 48 now 96 for 32bpp.
+
+		// How much do we need and how much have we used. 8 bits to bytes, 65536 64k and 1.8 to add a little extra.
+		$need = round(((($sizes[0] * $sizes[1] * $bitDepth / 8) + 65536 + memory_get_usage()) * 1.8) / 1048576);
+		$have = (int) ini_get('memory_limit');
+
+		// We need to set a hard limit, can't have them using all the memory
+		if ($need > $modSettings['ipmemlimit'])
+			return false;
+
+		// Lets not care how much we have and just set it.
+		if (ini_set('memory_limit', $modSettings['ipmemlimit'].'M') === false && $need > $have)
+			return false; // Server rejected
+	}
+	elseif (function_exists('memory_get_usage'))
 	{
 		// Memory calculation goes here:
 		$info['bits'] = !empty($info['bits']) ? $info['bits'] : 8;
@@ -473,11 +494,14 @@ function AutoRotation_Inbound($index, $pm = false)
 {
 	global $modSettings, $sourcedir;
 
+	// Figure some things out:
+	$pre = $pm ? 'pm_' : '';
+	$sizeLimit = !empty($modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) ? max(0, $modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) * 1024 : 0;
+
 	// Find out image mime type.
 	$imageSize = @getimagesize($_FILES['attachment']['tmp_name'][$index]);
 
 	// If it's a JPEG image rotate it if necessary.
-	$pre = $pm ? 'pm_' : '';
 	if ($imageSize['mime'] == 'image/jpeg')
 	{
 		// Disable image reencoding to enable image rotation.
@@ -490,7 +514,7 @@ function AutoRotation_Inbound($index, $pm = false)
 		$imageExif = @exif_read_data($_FILES['attachment']['tmp_name'][$index]);
 		if (array_key_exists('Orientation', $imageExif))
 		{
-			if ($_FILES['attachment']['size'][$index] <= $modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit'] * 1024)
+			if ($_FILES['attachment']['size'][$index] <= $sizeLimit)
 			{
 				$imageOrientation = $imageExif['Orientation'];
 				switch($imageOrientation)
@@ -519,10 +543,9 @@ function AutoRotation_Inbound($index, $pm = false)
 		// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
 		// or attachment image width/height values are set and it's too wide/high,
 		// or it's not a BMP image and it's too large ...
-		$sizeLimit = !empty(($modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) ? $modSettings[($pm ? 'A' : 'a') . 'ttachmentSizeLimit'] * 1024 : 0;
 		if ($type == 6 || ($type != 2 && !empty($modSettings[$pre . 'attachment_image_reformat']))
-			|| (!empty($modSettings[$pre . 'attachment_image_width']) && $width > $modSettings[$pre . 'attachment_image_width'])
-			|| (!empty($modSettings[$pre . 'attachment_image_height']) && $height > $modSettings[$pre . 'attachment_image_height'])
+			|| (!empty($modSettings[$pre . 'attachment_image_width']) && $modSettings[$pre . 'attachment_image_width'] > 0 && $width > $modSettings[$pre . 'attachment_image_width'])
+			|| (!empty($modSettings[$pre . 'attachment_image_height']) && $modSettings[$pre . 'attachment_image_height'] > 0 && $height > $modSettings[$pre . 'attachment_image_height'])
 			|| ($type != 6 && !empty($sizeLimit) && $_FILES['attachment']['size'][$index] > $sizeLimit))
 		{
 			// What size should this image be?

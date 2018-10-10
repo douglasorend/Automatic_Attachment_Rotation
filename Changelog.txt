@@ -1,3 +1,8 @@
+v4.2 - April 3rd, 2018
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3967893#msg3967893]GL700's post[/url], fixed syntax error in [b]Subs-AutoRotation.php[/b].
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3967928#msg3967928]GL700's post[/url], fixed issue where same message for rotating images as deleting images.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], changed code to avoid "white screen of death" when rotating images manually.
+
 v4.1 - March 30th, 2018
 o Changed some code to avoid undefined array element errors.
 o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], added check to see if file size is greater than 0.
