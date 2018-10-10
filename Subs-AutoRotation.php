@@ -47,15 +47,9 @@ function AutoRotation_GetOrientation($filename)
 //==============================================================================
 // Function dealing with Auto-Rotation of attachments:
 //==============================================================================
-function AutoRotation_Convert($size)
-{
-	$unit=array('B','KB','MB','GB','TB','PB');
-	return @round($size/pow(1024,($i=floor(log($size,1024)))),2).$unit[$i];
-}
-
 function AutoRotation_Process($filename, $orientation = false)
 {
-	global $context;
+	global $context, $modSettings;
 	static $default_formats = array(
 		'1' => 'gif',
 		'2' => 'jpeg',
@@ -69,8 +63,12 @@ function AutoRotation_Process($filename, $orientation = false)
 		return false;
 
 	// A known and supported format?
-	list($width, $height, $preferred_format, $attr) = @getimagesize($filename);
-	$format = isset($default_formats[$preferred_format]) ? $default_formats[$preferred_format] : false;
+	$info = @getimagesize($filename);
+	if (!$info)
+		return false;
+	$width = $info[0];
+	$height = $info[1];
+	$format = isset($default_formats[$info[2]]) ? $default_formats[$info[2]] : false;
 	if (!$format || !function_exists('imagecreatefrom' . $format))
 		return false;
 
@@ -83,12 +81,32 @@ function AutoRotation_Process($filename, $orientation = false)
 	// Let's attempt to allocate enough memory for this:
 	if (function_exists('memory_get_usage'))
 	{
-		$memoryNeeded = $width * $height * 4 * 2;
-		if (memory_get_usage() + $memoryNeeded > (integer) ini_get('memory_limit') * pow(1024, 2))
-			@ini_set('memory_limit', (integer) ini_get('memory_limit') + ceil(((memory_get_usage() + $memoryNeeded) - (integer) ini_get('memory_limit') * pow(1024, 2)) / pow(1024, 2)) . 'M');
-		if (memory_get_usage() + $memoryNeeded > (integer) ini_get('memory_limit') * pow(1024, 2))
+		// Memory calculation goes here:
+		$info['bits'] = !empty($info['bits']) ? $info['bits'] : 8;
+		$info['channels'] = !empty($info['channels']) ? $info['channels'] : 4;
+		$memoryNeeded = ceil($width * $height * $info['bits'] * $info['channels'] / 8 * 2);
+		$currentMemory = memory_get_usage() + $memoryNeeded;
+		$memoryLimit = ini_get('memory_limit');
+		$memoryRequested = (int) $memoryLimit + ceil(($currentMemory - $memoryLimit * pow(1024, 2)) / pow(1024, 2)));
+		
+		// Do we have enough memory?  If not, try to allocate enough:
+		if ($currentMemory > (integer) ini_get('memory_limit') * pow(1024, 2))
+			@ini_set('memory_limit', $memoryRequested);
+
+		// Were we successful?  If not, log the error if option is set:
+		if ($currentMemory > (integer) ini_get('memory_limit') * pow(1024, 2))
+		{
+			if (!empty($modSettings['AutoRotation_log_error']))
+			{
+				loadLanguage('AutoRotation');
+				log_error(sprintf('AutoRotation_memory_issue', $memoryRequested));
+			}
 			return false;
+		}
 	}
+	else
+	// FALLBACK METHOD: Try to allocate 256MB of memory....
+		@ini_set('memory_limit', '256M');
 
 	// Load up the image.  Abort if failure:
 	$imagecreatefrom = 'imagecreatefrom' . $format;
@@ -287,25 +305,65 @@ if (!function_exists('imageflip'))
 //==============================================================================
 if (!function_exists('imagerotate'))
 {
-	function imagerotate($image, $angle, $bgd_color = NULL, $ignore_transparent = NULL)
+	function imagerotate($src_img, $angle, $bgd_color = 0, $ignore_transparent = 0 ])
 	{
+		$src_x = imagesx($src_img);
+		$src_y = imagesy($src_img);
 		if ($angle == 180)
-			return imagerotate(imagerotate($image, 90), 90);
-		if ($angle != 270 && $angle != 90)
-			return $image;
-		$width = imagesx($image);
-		$height = imagesy($image);
-		$side = $width > $height ? $width : $height;
-		$imageSquare = imagecreatetruecolor($side, $side);
-		imagecopy($imageSquare, $image, 0, 0, 0, 0, $width, $height);
-		imagedestroy($image);
-		$imageSquare = imagerotate($imageSquare, $angle, 0, -1);
-		$image = imagecreatetruecolor($height, $width);
-		$x = $angle == 90 ? 0 : ($height > $width ? 0 : ($side - $height));
-		$y = $angle == 270 ? 0 : ($height < $width ? 0 : ($side - $width));
-		imagecopy($image, $imageSquare, 0, 0, $x, $y, $height, $width);
-		imagedestroy($imageSquare);
-		return $image;
+		{
+			$dest_x = $src_x;
+			$dest_y = $src_y;
+		}
+		elseif ($src_x <= $src_y)
+		{
+			$dest_x = $src_y;
+			$dest_y = $src_x;
+		}
+		elseif ($src_x >= $src_y)
+		{
+			$dest_x = $src_y;
+			$dest_y = $src_x;
+		}
+
+		$rotate = imagecreatetruecolor($dest_x, $dest_y);
+		imagealphablending($rotate, false);
+
+		switch ($angle)
+		{
+			case 270:
+				for ($y = 0; $y < $src_y; $y++)
+				{
+					for ($x = 0; $x < $src_x; $x++)
+					{
+						$color = imagecolorat($src_img, $x, $y);
+						imagesetpixel($rotate, $dest_x - $y - 1, $x, $color);
+					}
+				}
+				break;
+			case 90:
+				for ($y = 0; $y < $src_y; $y++)
+				{
+					for ($x = 0; $x < $src_x; $x++)
+					{
+						$color = imagecolorat($src_img, $x, $y);
+						imagesetpixel($rotate, $y, $dest_y - $x - 1, $color);
+					}
+				}
+				break;
+			case 180:
+				for ($y = 0; $y < $src_y; $y++)
+				{
+					for ($x = 0; $x < $src_x; $x++)
+					{
+						$color = imagecolorat($src_img, $x, $y);
+						imagesetpixel($rotate, $dest_x - $x - 1, $dest_y - $y - 1, $color);
+					}
+				}
+				break;
+			default: 
+				$rotate = $src_img; 
+		}
+		return $rotate; 
 	}
 }
 

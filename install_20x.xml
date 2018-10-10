@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>3.4</version>
+<version>3.5</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -96,7 +96,16 @@
 	
 	]]></add>
 	</operation>
-	
+
+	<!-- ManageAttachmentSettings function -->
+	<operation>
+		<search position="before"><![CDATA[array('text', 'attachmentThumbHeight', 6),]]></search>
+		<add><![CDATA[
+		'',
+			// Log rotation error setting
+			array('check', 'AutoRotation_log_error'),]]></add>
+	</operation>
+
 	<!-- BrowseFiles function -->
 	<operation>
 		<search position="replace"><![CDATA[	$link .= sprintf(\'%1$s?action=dlattach;topic=%2$d.0;attach=%3$d\', $scripturl, $rowData[\'id_topic\'], $rowData[\'id_attach\']);]]></search>
@@ -143,10 +152,9 @@
 	<!-- Post function -->
 	<operation>
 		<search position="after"><![CDATA[
-
 	// You can't reply with a poll... hacker.]]></search>
-		<add><![CDATA[
-	loadLanguage('AutoRotation');]]></add>
+		<add><![CDATA[	loadLanguage('AutoRotation');
+]]></add>
 	</operation>
 
 	<!-- Post2 function -->

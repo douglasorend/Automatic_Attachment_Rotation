@@ -1,3 +1,11 @@
+v3.5 - September 4th, 2017
+o Added support for SMF 2.1 Beta 3.
+o Removed support for SMF 2.1 Beta 2.
+o Added ability to log "unable to allocate enough memory" errors.
+o Added setting to enable logging of "unable to allocate enough memory" errors.
+o Replaced code for fallback mod-defined [b]imagerotate[/b] function.
+o [b]FALLBACK:[/b] Try to get 256MB of memory if [b]memory_get_usage[/b] function not available.
+
 v3.4 - August 5th, 2017
 o Added code to dynamically adjust memory to try to stop white screen issues.
 

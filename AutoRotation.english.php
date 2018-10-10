@@ -23,5 +23,7 @@ $txt['img_rotate'] = 'Rotate Images';
 $txt['attachment_clear_rotation_title'] = 'Reset Orientation Flag';
 $txt['attachment_clear_rotation_desc'] = 'This function will clear the orientation flags in the database for all image attachments.  Please note that this function cannot fix images that do not contain the EXIF information, such as images that SMF has re-encoded.  This operation does <strong>NOT</strong> change the images at this time, but signals the images to be reprocessed at post display time.';
 $txt['attachment_clear_rotation_button'] = 'Clear Orientation Flags';
+$txt['AutoRotation_log_error'] = 'Log memory error while Rotating image?';
+$txt['AutoRotation_memory_issue'] = 'Unable to allocate %1$d of memory for image rotation.';
 
 ?>

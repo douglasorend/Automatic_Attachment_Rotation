@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation</name>
-<version>3.4</version>
+<version>3.5</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -14,11 +14,11 @@
 		]]></add>
 	</operation>
 	<operation>
-		<search position="after"><![CDATA[IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
+		<search position="after"><![CDATA[COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
 		<add><![CDATA[a.proper_rotation AS img_rotation, ]]></add>
 	</operation>
 	<operation>
-		<search position="before"><![CDATA[IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
+		<search position="before"><![CDATA[COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height]]></search>
 		<add><![CDATA[,
 					thumb.proper_rotation AS thumb_rotation, thumb.id_folder AS thumb_folder, 
 					thumb.file_hash AS thumb_hash, thumb.filename AS thumb_name]]></add>
@@ -53,36 +53,6 @@
 	if (!$proper_rotation && (isset($_REQUEST['type']) && $_REQUEST['type'] != 'avatar'))
 		AutoRotation_Download($filename, $_REQUEST['attach'], $attachment_type);]]></add>
 	</operation>
-	
-	<!-- loadAttachmentContext function -->
-	<operation>
-		<search position="after"><![CDATA[$attachmentData[$i] = array(]]></search>
-		<add><![CDATA[$time = filemtime(getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']));
-
-			]]></add>
-	</operation>
-	<operation>
-		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach']]]></search>
-		<add><![CDATA[ . ';ts=' . $time]]></add>
-	</operation>
-	<operation>
-		<search position="before"><![CDATA['link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_attach'] . ']]></search>
-		<add><![CDATA[;ts=' . $time . ']]></add>
-	</operation>
-	<operation>
-		<search position="after"><![CDATA[
-				// Only adjust dimensions on successful thumbnail creation.]]></search>
-		<add><![CDATA[else
-					$thumb_realname = getAttachmentFilename($attachment['thumb_name'], $attachment['id_thumb'], $attachment['thumb_folder'], false, $attachment['thumb_hash']);
-					
-				// Get timestamp for thumbnail image:
-				$time = !empty($thumb_realname) && file_exists($thumb_realname) ? filemtime($thumb_realname) : false;
-]]></add>
-	</operation>
-	<operation>
-		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $topic . '.0;attach=' . $attachment['id_thumb'] . ';image']]></search>
-		<add><![CDATA[ . ';ts=' . $time]]></add>
-	</operation>
 </file>
 <file name="$sourcedir/ManageAttachments.php">
 	<!-- ManageAttachments function -->
@@ -91,6 +61,15 @@
 		<add><![CDATA['remove' => 'AutoRotation_Remove',]]></add>
 	</operation>
 	
+	<!-- ManageAttachmentSettings function -->
+	<operation>
+		<search position="before"><![CDATA[array('text', 'attachmentThumbHeight', 6),]]></search>
+		<add><![CDATA[
+		'',
+			// Log rotation error setting
+			array('check', 'AutoRotation_log_error'),]]></add>
+	</operation>
+
 	<!-- BrowseFiles function -->
 	<operation>
 		<search position="replace"><![CDATA[	$link .= sprintf('%1$s?action=dlattach;topic=%2$d.0;attach=%3$d', $scripturl, $rowData['id_topic'], $rowData['id_attach']);]]></search>
@@ -163,6 +142,37 @@
 	]]></add>
 	</operation>
 </file>
+<file name="$sourcedir/Subs-Attachments.php">
+	<!-- loadAttachmentContext function -->
+	<operation>
+		<search position="after"><![CDATA[$attachmentData[$i] = array(]]></search>
+		<add><![CDATA[$time = filemtime(getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder'], false, $attachment['file_hash']));
+
+			]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_attach']]]></search>
+		<add><![CDATA[ . ';ts=' . $time]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA['link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_attach'] . ']]></search>
+		<add><![CDATA[;ts=' . $time . ']]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+				// Only adjust dimensions on successful thumbnail creation.]]></search>
+		<add><![CDATA[else
+					$thumb_realname = getAttachmentFilename($attachment['thumb_name'], $attachment['id_thumb'], $attachment['thumb_folder'], false, $attachment['thumb_hash']);
+					
+				// Get timestamp for thumbnail image:
+				$time = !empty($thumb_realname) && file_exists($thumb_realname) ? filemtime($thumb_realname) : false;
+]]></add>
+	</operation>
+	<operation>
+		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_thumb'] . ';image']]></search>
+		<add><![CDATA[ . ';ts=' . $time]]></add>
+	</operation>
+</file>
 <file name="$sourcedir/Subs-Graphics.php">
 	<!-- resizeImageFile function -->
 	<operation>
@@ -186,8 +196,9 @@
 <file name="$themedir/ManageAttachments.template.php">
 	<operation>
 		<search position="before"><![CDATA[<input type="hidden" name="type" value="avatars">
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-				<input type="hidden" name="sa" value="byAge">]]></search>
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
+					<input type="hidden" name="sa" value="byAge">
+				</dl>]]></search>
 		<add><![CDATA[
 			</form>
 		</div>
