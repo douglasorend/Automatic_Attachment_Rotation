@@ -19,18 +19,19 @@ Beside each attachment, there is a dropbox for image rotation, listing the optio
 
 [color=blue][b][size=12pt][u]Manual Rotation Options[/u][/size][/b][/color]
 o No Change
+o Rotate 90° Right
+o Rotate 90° Left.
+o Rotate 180°
 o Horizontal Flip
-o Rotate 180 degrees
 o Vertical Flip
-o Vertical Flip, Rotate 270 degrees clockwise. (90 degrees counter-clockwise)
-o Rotate 270 degrees clockwise. (90 degrees counter-clockwise)
-o Horizontal Flip, Rotate 270 degrees clockwise. (90 degrees counter-clockwise)
-o Rotate 90 degrees clockwise.
+o Horizontal Flip, Rotate 90° Right
+o Vertical Flip, Rotate 90° Right
 
 [color=blue][b][size=12pt][u]Compatibility Notes[/u][/size][/b][/color]
 This mod was tested on SMF 2.0.12 and 2.1 Beta 3, but should work on SMF 2.0 and up.  SMF 1.x is not and will not be supported.
 
 [color=blue][b][size=12pt][u]Translators[/u][/size][/b][/color]
+o Dutch: [url=https://www.simplemachines.org/community/index.php?action=profile;u=287786]@rjen[/url]
 o Spanish Latin: [url=https://www.simplemachines.org/community/index.php?action=profile;u=322597]Rock Lee[/url].
 
 [color=blue][b][size=12pt][u]Special Credit[/u][/size][/b][/color]

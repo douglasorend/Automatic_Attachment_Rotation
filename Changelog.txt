@@ -1,3 +1,8 @@
+v3.12 - February 22nd, 2018
+o Added Dutch translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=287786]@rjen[/url]!
+o 2nd attempt: Changed order of rotation/flip strings in templates, per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url]'s post above.
+o Changed documentation to reflect new order of manual rotation options.
+
 v3.11 - February 20th, 2018
 o Updated Spanish Latin translations, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=322597]Rock Lee[/url].
 o Changed rotation/flip strings for better understandability, per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url]'s post above.
