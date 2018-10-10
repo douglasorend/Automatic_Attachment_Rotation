@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation (and Resize)</name>
-<version>4.7</version>
+<version>5.0</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -217,10 +217,20 @@
 </file>
 <file name="$sourcedir/ManageAttachments.php">
 	<!-- ManageAttachments function -->
+	<operation>	<!-- line 119 -->
+		<search position="before"><![CDATA['attachpaths' => 'ManageAttachmentPaths',]]></search>
+		<add><![CDATA[
+		'resizebatch' => 'ResizeBatch',
+		'resizebrowse' => 'ResizeBrowse',
+		'resizeselect' => 'ResizeSelect',]]></add>
+	</operation>
 	<operation>	<!-- line 131 -->
 		<search position="after"><![CDATA[// Pick the correct sub-action.]]></search>
 		<add><![CDATA[AutoRotation_AdminHook($subActions);
 	loadLanguage('AutoRotation');
+
+	global $sourcedir;
+	require_once($sourcedir . '/Subs-ResizeExistingImages.php');
 
 	]]></add>
 	</operation>
@@ -271,8 +281,7 @@
 											<option value="4">' . $txt['img_orientation4'] . '</option>
 											<option value="7">' . $txt['img_orientation7'] . '</option>
 											<option value="5">' . $txt['img_orientation5'] . '</option>
-										</select>\',
-								$rowData[\'id_attach\']);
+										</select>\', $rowData[\'id_attach\']);
 						return !empty($rowData[\'width\']) && !empty($rowData[\'height\']) ? $str : false;
 					'),
 					'style' => 'text-align: center',
@@ -296,6 +305,15 @@
 	<operation>	<!-- line 513 -->
 		<search position="after"><![CDATA[a.id_attach, a.filename, a.file_hash, a.attachment_type, a.size, a.width, a.height, a.downloads, mf.subject, t.id_board]]></search>
 		<add><![CDATA[a.id_folder, ]]></add>
+	</operation>
+
+	<!-- MaintainFiles function -->
+	<operation>	<!-- line 639 -->
+		<search position="before"><![CDATA[$context['attachment_total_size'] = round($attachmentDirSize, 2);
+]]></search>
+		<add><![CDATA[
+	$_SESSION['total_attachment_space'] = $context['attachment_total_size'];
+]]></add>
 	</operation>
 
 	<!-- RemoveAttachment function -->
@@ -336,6 +354,26 @@
 		<add><![CDATA[	loadLanguage('AutoRotation');
 ]]></add>
 	</operation>
+	<operation>	<!-- line 712 -->
+		<search position="before"><![CDATA[,
+				m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
+				IFNULL(a.size, -1) AS filesize, a.filename, a.id_attach,]]></search>
+		<add><![CDATA[ a.width, a.height,]]></add>
+	</operation>
+	<operation>	<!-- line 777 -->
+		<search position="before"><![CDATA[		// Load up 'em attachments!
+		foreach ($attachment_stuff as $attachment)
+		{
+			if ($attachment['filesize'] >= 0 && !empty($modSettings['attachmentEnable']))
+				$context['current_attachments'][] = array(
+					'name' => htmlspecialchars($attachment['filename']),
+					'id' => $attachment['id_attach'],
+					'approved' => $attachment['attachment_approved'],
+]]></search>
+		<add><![CDATA[					'width' => $attachment['width'],
+					'height' => $attachment['height'],
+]]></add>
+	</operation>
 	<operation>	<!-- line 985 -->
 		<search position="before"><![CDATA[				if ($_FILES['attachment']['name'][$n] == '')
 					continue;
@@ -366,12 +404,11 @@
 	]]></add>
 	</operation>
 	<operation>	<!-- line 1763 -->
-		<search position="after"><![CDATA[
-			// Check the total upload size for this post...]]></search>
-		<add><![CDATA[
-			// Automatic Attachment Rotation (and Resize) alteration:
-			require_once($sourcedir . '/Subs-AutoRotation.php');
-			AutoRotation_Inbound($n);
+		<search position="after"><![CDATA[			// Check the total upload size for this post...]]></search>
+		<add><![CDATA[				// Automatic Attachment Rotation (and Resize) alteration:
+				require_once($sourcedir . '/Subs-AutoRotation.php');
+				AutoRotation_Inbound($n);
+
 ]]></add>
 	</operation>
 </file>
@@ -454,7 +491,39 @@
 	</operation>
 </file>
 <file name="$themedir/ManageAttachments.template.php">
-	<operation>
+	<!-- template_browse function -->
+	<operation> <!-- line 48 -->
+		<search position="before"><![CDATA[$txt['attachment_manager_attachments'], '</a> |]]></search>
+		<add><![CDATA[
+				<a href="', $scripturl, '?action=admin;area=manageattachments;sa=resizebrowse;resize">', $context['browse_type'] === 'resize' ? '<img src="' . $settings['images_url'] . '/selected.gif" alt="&gt;" /> ' : '', $txt['resize_images'], '</a> |]]></add>
+	</operation>
+
+	<!-- template_maintenance function -->
+	<operation> <!-- line 62 -->
+		<search position="before"><![CDATA[function template_maintenance()
+{
+	global $context, $settings, $options, $scripturl, $txt]]></search>
+		<add><![CDATA[, $modSettings]]></add>
+	</operation>
+	<operation> <!-- line 96 -->
+		<search position="after"><![CDATA[		<div class="cat_bar">
+			<h3 class="catbg">', $txt['attachment_pruning'], '</h3>]]></search>
+		<add><![CDATA[		<div class="cat_bar">
+			<h3 class="catbg">', $txt['resize_images_batch'], '</h3>
+		</div>
+		<div class="windowbg2">
+			<span class="topslice"><span></span></span>
+			<div class="content" style="margin-top: -10px">
+				<form action="', $scripturl, '?action=admin;area=manageattachments;sa=resizebatch;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
+					<p>', $txt['resize_images_batch_desc'], '</p>
+					<input type="submit" name="submit" value="', (empty($modSettings['attachment_image_reformat']) ? $txt['resize_images_now'] : $txt['resize_reformat_images_now']), '" class="button_submit" />
+				</form>
+			</div>
+			<span class="botslice"><span></span></span>
+		</div>
+]]></add>
+	</operation>
+	<operation>	<!-- line 123 -->
 		<search position="before"><![CDATA[<input type="hidden" name="type" value="avatars" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="sa" value="byAge" />]]></search>
@@ -475,9 +544,150 @@
 	</operation>
 </file>
 <file name="$themedir/Post.template.php">
+	<!-- template_main function -->
+	<operation error="ignore"> <!-- Line 448 - code change when 'Post and PM Inline Attachments' mod is NOT installed -->
+		<search position="replace"><![CDATA[foreach ($context['current_attachments'] as $attachment)
+			echo '
+						<dd class="smalltext">
+							<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''), '</label>
+						</dd>';]]></search>
+		<add><![CDATA[foreach ($context['current_attachments'] as $attachment)
+		{
+			echo '
+						<dd class="smalltext">
+							<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" />', $attachment['name'];
+
+			if (!empty($attachment['width']) && !empty($attachment['height']))
+				echo
+									' (', $txt['img_orientation'], ': ',
+									sprintf('<select id="orient[%1$d]" name="orient[%1$d]">
+												<option value="0">' . $txt['img_orientation1'] . '</option>
+												<option value="6">' . $txt['img_orientation6'] . '</option>
+												<option value="8">' . $txt['img_orientation8'] . '</option>
+												<option value="3">' . $txt['img_orientation3'] . '</option>
+												<option value="2">' . $txt['img_orientation2'] . '</option>
+												<option value="4">' . $txt['img_orientation4'] . '</option>
+												<option value="7">' . $txt['img_orientation7'] . '</option>
+												<option value="5">' . $txt['img_orientation5'] . '</option>
+											</select>', $attachment['id']), ') ';
+
+			echo
+								(empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''), '</label>
+						</dd>';
+		}]]></add>
+	</operation>
+	<operation error="ignore"> <!-- Line 448 - code change when 'Post and PM Inline Attachments' mod is installed -->
+		<search position="replace"><![CDATA[foreach ($context['current_attachments'] as $attid => $attachment)
+			echo '
+						<dd class="smalltext">
+							<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''), ' <a onclick="insertAttachment(', ($attid + !empty($modSettings['ila_one_based_numbering'])), '); return false;">(', sprintf($txt['ila_insert'], ($attid + !empty($modSettings['ila_one_based_numbering']))), ')</a></label>
+						</dd>';]]></search>
+		<add><![CDATA[foreach ($context['current_attachments'] as $attachment)
+		{
+			echo '
+						<dd class="smalltext">
+							<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" />', $attachment['name'];
+
+			if (!empty($attachment['width']) && !empty($attachment['height']))
+				echo
+									' (', $txt['img_orientation'], ': ',
+									sprintf('<select id="orient[%1$d]" name="orient[%1$d]">
+												<option value="0">' . $txt['img_orientation1'] . '</option>
+												<option value="6">' . $txt['img_orientation6'] . '</option>
+												<option value="8">' . $txt['img_orientation8'] . '</option>
+												<option value="3">' . $txt['img_orientation3'] . '</option>
+												<option value="2">' . $txt['img_orientation2'] . '</option>
+												<option value="4">' . $txt['img_orientation4'] . '</option>
+												<option value="7">' . $txt['img_orientation7'] . '</option>
+												<option value="5">' . $txt['img_orientation5'] . '</option>
+											</select>', $attachment['id']), ') ';
+
+			echo
+								(empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''), ' <a onclick="insertAttachment(', ($attid + !empty($modSettings['ila_one_based_numbering'])), '); return false;">(', sprintf($txt['ila_insert'], ($attid + !empty($modSettings['ila_one_based_numbering']))), ')</a></label>
+						</dd>';
+		}]]></add>
+	</operation>
+</file>
+<file name="$languagedir/Modifications.english.php">
 	<operation>
-		<search position="before"><![CDATA[class="input_check" /> ', $attachment['name'], ]]></search>
-		<add><![CDATA[' (', $txt['img_orientation'], ': ', sprintf('<select id="orient[%1$d]" name="orient[%1$d]"><option value="0">' . $txt['img_orientation1'] . '</option><option value="6">' . $txt['img_orientation6'] . '</option><option value="8">' . $txt['img_orientation8'] . '</option><option value="3">' . $txt['img_orientation3'] . '</option><option value="2">' . $txt['img_orientation2'] . '</option><option value="4">' . $txt['img_orientation4'] . '</option><option value="7">' . $txt['img_orientation7'] . '</option><option value="5">' . $txt['img_orientation5'] . '</option></select>', $attachment['id']), ')', ]]></add>
+		<search position="end" />
+		<add><![CDATA[
+// Begin Resize Existing Images Text Strings
+$txt['resize_images'] = 'Resize Existing Images';
+$txt['resize_images_desc'] = '<i>Resize Existing Images</i> resizes and/or reformats existing images to match the options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.';
+
+$txt['resize_images_batch'] = 'Batch Resize Existing Images';
+$txt['resize_images_batch_desc'] = '<i>Batch Resize Existing Images</i> resizes and/or reformats <b>all</b> existing images to match the options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.<br/><br/>In order to prevent server overload the number of images processed in each pass is the value specified by <i>Admin -> Forum -> Posts and Topics -> Topic Settings -> Number of posts per page in a topic page</i>.';
+
+$txt['resize_reformat_images'] = 'Resize and/or Reformat Existing Images';
+
+$txt['resize_images_now'] = 'Resize Existing Images Now';
+$txt['resize_reformat_images_now'] = 'Resize and/or Reformat Existing Images Now';
+
+$txt['resize_image_height'] = 'Image Height';
+$txt['resize_image_width'] = 'Image Width';
+$txt['resize_image_jpeg_quality'] = 'JPEG Quality';
+
+$txt['resize_number_images'] = '<b>Number of Images to be Resized : </b>';
+$txt['resize_batch_size'] = '<b>Images being resized in batches of : </b>';
+$txt['resize_images_to_resize'] = '<b>Images still to resize : </b>';
+
+$txt['resize_images_complete'] = 'Resize Existing Images Results';
+$txt['resize_images_empty_desc'] = 'There are no images for <i>Resize Existing Images</i> to process.';
+$txt['resize_images_complete_desc'] = '<i>Resize Existing Images</i> has finished processing the images.';
+$txt['resize_start_time'] = '<b>Start Time : </b>';
+$txt['resize_finish_time'] = '<b>Finish Time : </b>';
+$txt['resize_elapsed_time'] = '<b>Elapsed Time : </b>';
+$txt['resize_total_resized'] = '<b>Total Number of Images Resized : </b>';
+$txt['resize_space_desc'] = 'The space used by <b>all</b> attachment types before and after this process was run, and the amount of space saved, is as follows:';
+$txt['resize_space_after'] = '<b>Attachment Space After : </b>';
+$txt['resize_space_before'] = '<b>Attachment Space Before : </b>';
+$txt['resize_space_saved'] = '<b>Attachment Space Saved : </b>';
+$txt['megabyte'] = ' Mb';
+// End Resize Existing Images Text Strings
+
+]]></add>
+	</operation>
+</file>
+<file name="$languagedir/Modifications.english-utf8.php" error="skip">
+	<operation>
+		<search position="end" />
+		<add><![CDATA[
+// Begin Resize Existing Images Text Strings
+$txt['resize_images'] = 'Resize Existing Images';
+$txt['resize_images_desc'] = '<i>Resize Existing Images</i> resizes and/or reformats existing images to match the options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.';
+
+$txt['resize_images_batch'] = 'Batch Resize Existing Images';
+$txt['resize_images_batch_desc'] = '<i>Batch Resize Existing Images</i> resizes and/or reformats <b>all</b> existing images to match the options (ie, Reformat non-JPEG images to JPEG, JPEG quality factor and/or max image width/height) configured via <i>Admin -> Forum -> Attachments and Avatars -> Attachment Settings</i>.<br/><br/>In order to prevent server overload the number of images processed in each pass is the value specified by <i>Admin -> Forum -> Posts and Topics -> Topic Settings -> Number of posts per page in a topic page</i>.';
+
+$txt['resize_reformat_images'] = 'Resize and/or Reformat Existing Images';
+
+$txt['resize_images_now'] = 'Resize Existing Images Now';
+$txt['resize_reformat_images_now'] = 'Resize and/or Reformat Existing Images Now';
+
+$txt['resize_image_height'] = 'Image Height';
+$txt['resize_image_width'] = 'Image Width';
+$txt['resize_image_jpeg_quality'] = 'JPEG Quality';
+
+$txt['resize_number_images'] = '<b>Number of Images to be Resized : </b>';
+$txt['resize_batch_size'] = '<b>Images being resized in batches of : </b>';
+$txt['resize_images_to_resize'] = '<b>Images still to resize : </b>';
+
+$txt['resize_images_complete'] = 'Resize Existing Images Results';
+$txt['resize_images_empty_desc'] = 'There are no images for <i>Resize Existing Images</i> to process.';
+$txt['resize_images_complete_desc'] = '<i>Resize Existing Images</i> has finished processing the images.';
+$txt['resize_start_time'] = '<b>Start Time : </b>';
+$txt['resize_finish_time'] = '<b>Finish Time : </b>';
+$txt['resize_elapsed_time'] = '<b>Elapsed Time : </b>';
+$txt['resize_total_resized'] = '<b>Total Number of Images Resized : </b>';
+$txt['resize_space_desc'] = 'The space used by <b>all</b> attachment types before and after this process was run, and the amount of space saved, is as follows:';
+$txt['resize_space_after'] = '<b>Attachment Space After : </b>';
+$txt['resize_space_before'] = '<b>Attachment Space Before : </b>';
+$txt['resize_space_saved'] = '<b>Attachment Space Saved : </b>';
+$txt['megabyte'] = ' Mb';
+// End Resize Existing Images Text Strings
+
+]]></add>
 	</operation>
 </file>
 </modification>

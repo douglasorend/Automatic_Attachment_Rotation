@@ -1,3 +1,8 @@
+v5.0 - April 27th, 2018
+o Added option for resizing existing images in either manual or batch mode.
+o Changed code to only display rotate/flip options for image attachments when modifying a post.
+o Fixed problem with readme file that was causing it not to display during package installation.
+
 v4.7 - April 12th, 2018
 o Updated Dutch translation, courtsey of [url=https://www.simplemachines.org/community/index.php?action=profile;u=287786]@rjen[/url]
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3968843#msg3968843]@rjen[/url] fixed issue where attachment is deleted if checkbox is selected and [i]Rotate/Flip Images[/i] button is clicked.

@@ -1,3 +1,3 @@
 Installation Complete!  
-You will now be taken to the 'Attachment Settings' page?  
+You will now be taken to the 'Attachment Settings' page.  
 Note:  If the 'PM Attachments' mod is also installed you will also need to review/configure the settings for this mod via 'PM Attachment Settings'.

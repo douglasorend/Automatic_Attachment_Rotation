@@ -1,65 +1,80 @@
 <?xml version="1.0"?>
 <!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
-
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
-	<id>Dougiefresh:AutoRotation</id>
 	<name>Automatic Attachment Rotation (and Resize)</name>
+	<id>Dougiefresh:AutoRotation</id>
 	<type>modification</type>
-	<version>4.7</version>
+	<version>5.0</version>
 
 	<install for="2.0 - 2.0.99">
-		<readme parsebbc="true">readme.txt</readme>
+		<readme type="file" parsebbc="true">readme.txt</readme>
 		<code>add_remove_hooks.php</code>
 		<database>db_install.php</database>
 		<modification>install_20x.xml</modification>
 		<require-file name="Class-exifReader.php" destination="$sourcedir" />
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
+		<require-file name="Subs-ResizeExistingImages.php" destination="$sourcedir" />
+		<require-file name="ResizeExistingImages.template.php" destination="$boarddir/Themes/default" />
 		<require-file name="AutoRotation.dutch.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.dutch-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.english.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.english-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin-utf8.php" destination="$boarddir/Themes/default/languages" />
-		<redirect url="?action=admin;area=manageattachments;sa=attachments">redirect.txt</redirect> 
+		<require-file name="ResizeExistingImages.english.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="ResizeExistingImages.english-utf8.php" destination="$boarddir/Themes/default/languages" />
+		<redirect timeout="5000" url="?action=admin;area=manageattachments;sa=attachments">redirect.txt</redirect> 
 	</install>
 	<uninstall for="2.0 - 2.0.99">
 		<code>add_remove_hooks.php</code>
 		<modification reverse="true">install_20x.xml</modification>
 		<remove-file name="$sourcedir/Class-exifReader.php" />		
 		<remove-file name="$sourcedir/Subs-AutoRotation.php" />		
+		<remove-file name="$sourcedir/Subs-ResizeExistingImages.php" />		
+		<remove-file name="$boarddir/Themes/default/ResizeExistingImages.template.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin-utf8.php" />
+		<remove-file name="$boarddir/Themes/default/languages/ResizeExistingImages.english.php" />
+		<remove-file name="$boarddir/Themes/default/languages/ResizeExistingImages.english-utf8.php" />
 	</uninstall>
 
-	<install for="2.1 Beta 2">
-		<readme parsebbc="true">readme.txt</readme>
+	<install for="2.1 Beta 3">
+		<readme type="file" parsebbc="true">readme.txt</readme>
 		<code>add_remove_hooks.php</code>
 		<database>db_install.php</database>
 		<modification>install_21x.xml</modification>
 		<require-file name="Class-exifReader.php" destination="$sourcedir" />
 		<require-file name="Subs-AutoRotation.php" destination="$sourcedir" />
+		<require-file name="Subs-ResizeExistingImages.php" destination="$sourcedir" />
+		<require-file name="ResizeExistingImages.template.php" destination="$boarddir/Themes/default" />
 		<require-file name="AutoRotation.dutch.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.dutch-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.english.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.english-utf8.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin.php" destination="$boarddir/Themes/default/languages" />
 		<require-file name="AutoRotation.spanish_latin-utf8.php" destination="$boarddir/Themes/default/languages" />
-		<redirect url="?action=admin;area=manageattachments;sa=attachments">redirect.txt</redirect> 
+		<require-file name="ResizeExistingImages.english.php" destination="$boarddir/Themes/default/languages" />
+		<require-file name="ResizeExistingImages.english-utf8.php" destination="$boarddir/Themes/default/languages" />
+		<redirect timeout="5000" url="?action=admin;area=manageattachments;sa=attachments">redirect.txt</redirect> 
 	</install>
-	<uninstall for="2.1 Beta 2">
+	<uninstall for="2.1 Beta 3">
 		<code>add_remove_hooks.php</code>
 		<modification reverse="true">install_21x.xml</modification>
 		<remove-file name="$sourcedir/Class-exifReader.php" />		
 		<remove-file name="$sourcedir/Subs-AutoRotation.php" />		
+		<remove-file name="$sourcedir/Subs-ResizeExistingImages.php" />		
+		<remove-file name="$boarddir/Themes/default/ResizeExistingImages.template.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.dutch-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.english-utf8.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin.php" />
 		<remove-file name="$boarddir/Themes/default/languages/AutoRotation.spanish_latin-utf8.php" />
+		<remove-file name="$boarddir/Themes/default/languages/ResizeExistingImages.english.php" />
+		<remove-file name="$boarddir/Themes/default/languages/ResizeExistingImages.english-utf8.php" />
 	</uninstall>
 </package-info>
