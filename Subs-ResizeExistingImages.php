@@ -74,7 +74,7 @@ function ResizeBatch()
 		$context['resize_results'] = $_SESSION['resize_results'];
 
 	// Get the next group of images that meet our criteria
-	$files = resize_getFiles((int) $_GET['step'], $chunk_size);
+	$files = resize_getFiles(0, $chunk_size);
 
 	// While we have images that have not been resized
 	foreach ($files as $row)
@@ -174,19 +174,26 @@ function pauseAttachmentResize($max_steps = 0)
 // - paginates results
 function ResizeBrowse()
 {
-	global $context, $txt, $scripturl, $modSettings, $sourcedir;
+	global $context, $txt, $scripturl, $modSettings, $sourcedir, $forum_version;
 
 	loadLanguage('ResizeExistingImages');
 
 	$context['sub_template'] = 'browse';
 	$context['browse_type'] = 'resize';
 
+	// Are we running SMF 2.0.x or SMF 2.1?
+	$smf20 = (substr($forum_version, 0, 7) == 'SMF 2.0');
+	if ($smf20)
+		$sa = "resizebrowse";
+	else
+		$sa = "browse;resize";
+
 	// Set the options for the list
 	$listOptions = array(
 		'id' => 'file_list',
 		'title' => (empty($modSettings['attachment_image_reformat']) ? $txt['resize_images'] : $txt['resize_reformat_images']),
 		'items_per_page' => $modSettings['defaultMaxMessages'],
-		'base_href' => $scripturl . '?action=admin;area=manageattachments;sa=resizebrowse;resize',
+		'base_href' => $scripturl . '?action=admin;area=manageattachments;sa=' . $sa,
 		'default_sort_col' => 'date',
 		'no_items_label' => $txt['resize_images_empty_desc'],
 		'get_items' => array(
@@ -395,13 +402,15 @@ function resize_getFiles($start, $chunk_size, $sort = '')
 			AND (({int:max_size} > 0 AND a.size > {int:max_size} AND a.mime_type != \'image/jpeg\')
 				OR ({int:max_width} > 0 AND a.width > {int:max_width}) OR ({int:max_height} > 0 AND a.height > {int:max_height})
 				OR (a.fileext = \'jpg\' AND a.jpeg_quality > {int:jpegQuality}))
-		ORDER BY a.id_attach
-		' . ((!empty($chunk_size)) ? 'LIMIT 0, {int:limit} ' : ''),
+		ORDER BY {raw:sort}
+		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'max_size' => $max_size,
 			'max_width' => $max_width,
 			'max_height' => $max_height,
 			'jpegQuality' => $jpegQuality,
+			'sort' => $sort,
+			'offset' => $start,
 			'limit' => $chunk_size,
 		)
 	);
