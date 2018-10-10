@@ -1,3 +1,9 @@
+v4.3 - April 5th, 2018
+o Fixed code to avoid distorting aspect ratio of resized pictures.
+o Added code to avoid resizing images if they are under/at admin-set dimensions.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], changed required for [b]Image Processing Memory Limit[/b] mod was made.
+o Per [url=https://www.simplemachines.org/community/index.php?action=profile;u=112942]GL700Wing[/url], fixed issue where JPEG quality/dimensions settings are empty.
+
 v4.2 - April 3rd, 2018
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3967893#msg3967893]GL700's post[/url], fixed syntax error in [b]Subs-AutoRotation.php[/b].
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3967928#msg3967928]GL700's post[/url], fixed issue where same message for rotating images as deleting images.

@@ -83,13 +83,13 @@ function AutoRotation_Process($filename, $orientation = false)
 	{
 		// Image Processing Memory Limit
 		// Do we know the bit depth?
-		if (!empty($sizes['bits']) && !empty($sizes['channels']))
-			$bitDepth = $sizes['bits'] * $sizes['channels'];
+		if (!empty($info['bits']) && !empty($info['channels']))
+			$bitDepth = $info['bits'] * $info['channels'];
 		else
 			$bitDepth = 96; // Probally a bad idea assuming, was 48 now 96 for 32bpp.
 
 		// How much do we need and how much have we used. 8 bits to bytes, 65536 64k and 1.8 to add a little extra.
-		$need = round(((($sizes[0] * $sizes[1] * $bitDepth / 8) + 65536 + memory_get_usage()) * 1.8) / 1048576);
+		$need = round(((($info[0] * $info[1] * $bitDepth / 8) + 65536 + memory_get_usage()) * 1.8) / 1048576);
 		$have = (int) ini_get('memory_limit');
 
 		// We need to set a hard limit, can't have them using all the memory
@@ -496,10 +496,13 @@ function AutoRotation_Inbound($index, $pm = false)
 
 	// Figure some things out:
 	$pre = $pm ? 'pm_' : '';
-	$sizeLimit = !empty($modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) ? max(0, $modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) * 1024 : 0;
+	$filename = $_FILES['attachment']['tmp_name'][$index];
+	$sizeLimit = empty($modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) ? 0 : max(0, $modSettings[($pm ? 'pmA' : 'a') . 'ttachmentSizeLimit']) * 1024;
+	$jpegQuality = min(100, empty($modSettings[$pre . 'attachment_jpeg_quality']) ? 100 : $modSettings[$pre . 'attachment_jpeg_quality']);
+	$imageRotated = false;
 
 	// Find out image mime type.
-	$imageSize = @getimagesize($_FILES['attachment']['tmp_name'][$index]);
+	$imageSize = @getimagesize($filename);
 
 	// If it's a JPEG image rotate it if necessary.
 	if ($imageSize['mime'] == 'image/jpeg')
@@ -508,11 +511,11 @@ function AutoRotation_Inbound($index, $pm = false)
 		$modSettings['attachment_image_reencode'] = false;
 
 		@ini_set('gd.jpeg_ignore_warning', 1);
-		$image = @imagecreatefromjpeg($_FILES['attachment']['tmp_name'][$index]);
+		$image = @imagecreatefromjpeg($filename);
 
 		// Rotate JPEG image according to Exif orientation.
-		$imageExif = @exif_read_data($_FILES['attachment']['tmp_name'][$index]);
-		if (array_key_exists('Orientation', $imageExif))
+		$imageExif = @exif_read_data($filename);
+		if (isset($imageExif['Orientation']) || array_key_exists('Orientation', $imageExif))
 		{
 			if ($_FILES['attachment']['size'][$index] <= $sizeLimit)
 			{
@@ -529,48 +532,40 @@ function AutoRotation_Inbound($index, $pm = false)
 						$image = imagerotate($image, 90, 0);
 						break;
 				}
+
+				$imageRotated = true;
 			}
 		}
 
 		// Create the JPEG file with maximum quality of 100%.
-		imagejpeg($image, $_FILES['attachment']['tmp_name'][$index], min($modSettings[$pre . 'attachment_jpeg_quality'], 100));
+		imagejpeg($image, $filename, $jpegQuality);
 		imagedestroy($image);
 	}
 
 	// Resize/reformat image and rotate it if necessary.
-	if (list ($width, $height, $type) = @getimagesize($_FILES['attachment']['tmp_name'][$index]))
+	if (list ($width, $height, $type) = @getimagesize($filename))
 	{
-		// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
-		// or attachment image width/height values are set and it's too wide/high,
-		// or it's not a BMP image and it's too large ...
-		if ($type == 6 || ($type != 2 && !empty($modSettings[$pre . 'attachment_image_reformat']))
-			|| (!empty($modSettings[$pre . 'attachment_image_width']) && $modSettings[$pre . 'attachment_image_width'] > 0 && $width > $modSettings[$pre . 'attachment_image_width'])
-			|| (!empty($modSettings[$pre . 'attachment_image_height']) && $modSettings[$pre . 'attachment_image_height'] > 0 && $height > $modSettings[$pre . 'attachment_image_height'])
-			|| ($type != 6 && !empty($sizeLimit) && $_FILES['attachment']['size'][$index] > $sizeLimit))
+		if (AutoRotation_Aspect($width, $height, $pre))
 		{
-			// What size should this image be?
-			$width = empty($modSettings[$pre . 'attachment_image_width'])? $width : min($width, $modSettings[$pre . 'attachment_image_width']);
-			$height = empty($modSettings[$pre . 'attachment_image_height']) ? $height : min($height, $modSettings[$pre . 'attachment_image_height']);
-
 			// Resize the image (and rotate it if necessary).
 			require_once($sourcedir . '/Subs-Graphics.php');
-			if (resizeImageFile($_FILES['attachment']['tmp_name'][$index], $_FILES['attachment']['tmp_name'][$index] . '.temp', $width, $height))
+			if (resizeImageFile($filename, $filename . '.temp', $width, $height, '', $jpegQuality))
 			{
 				// Delete the old tmp file and rename the new one.
-				unlink($_FILES['attachment']['tmp_name'][$index]);
-				rename($_FILES['attachment']['tmp_name'][$index] . '.temp', $_FILES['attachment']['tmp_name'][$index]);
+				unlink($filename);
+				rename($filename . '.temp', $filename);
 
 				// If it's a JPEG image rotate and/or compress the image.
-				if ($imageSize['mime'] == 'image/jpeg')
+				if ($imageSize['mime'] == 'image/jpeg' && !$imageRotated)
 				{
 					// Disable image reencoding to enable image rotation.
 					$modSettings['attachment_image_reencode'] = false;
 
 					@ini_set ('gd.jpeg_ignore_warning', 1);
-					$image = @imagecreatefromjpeg($_FILES['attachment']['tmp_name'][$index]);
+					$image = @imagecreatefromjpeg($filename);
 
 					// Rotate JPEG image according to Exif orientation.
-					if (array_key_exists('Orientation', $imageExif))
+					if (isset($imageExif['Orientation']) || array_key_exists('Orientation', $imageExif))
 					{
 						$imageOrientation = $imageExif['Orientation'];
 						switch($imageOrientation)
@@ -588,19 +583,38 @@ function AutoRotation_Inbound($index, $pm = false)
 					}
 
 					// Create the JPEG file with maximum quality of 100%.
-					imagejpeg($image, $_FILES['attachment']['tmp_name'][$index], min($modSettings[$pre . 'attachment_jpeg_quality'], 100));
+					imagejpeg($image, $filename, $jpegQuality);
 					imagedestroy($image);
 				}
 
 				// Recheck the file size
-				$_FILES['attachment']['size'][$index] = filesize($_FILES['attachment']['tmp_name'][$index]);
+				$_FILES['attachment']['size'][$index] = filesize($filename);
 
 				// Change the file suffix to 'jpg' if necessary.
-				if (!empty($modSettings[$pre . 'attachment_image_reformat']) && strrchr($_FILES['attachment']['name'][$index], '.') != '.jpg')
-					$_FILES['attachment']['name'][$index] = substr($_FILES['attachment']['name'][$index], 0, -(strlen(strrchr($_FILES['attachment']['name'][$index], '.')))) . '.jpg';
+				$filename = $_FILES['attachment']['name'][$index];
+				if (!empty($modSettings[$pre . 'attachment_image_reformat']) && strrchr($filename, '.') != '.jpg')
+					$filename = substr($filename, 0, -(strlen(strrchr($filename, '.')))) . '.jpg';
 			}
 		}
 	}
+}
+
+function AutoRotation_Aspect(&$width, &$height, $pre = '')
+{
+	global $modSettings;
+
+	// If image dimensions are equal to or below admin settings, don't continue:
+	$max_width = !empty($modSettings[$pre . 'attachment_image_width']) ? $modSettings[$pre . 'attachment_image_width'] : $width;
+	$max_height = !empty($modSettings[$pre . 'attachment_image_height']) ? $modSettings[$pre . 'attachment_image_height'] : $height;
+	if ($width <= $max_width && $height <= $max_height)
+		return false;
+
+	// Adjust size of image, maintaining aspect ratio of image.  Note that the code rounds
+	// the decimals up to the next number, to avoid creating images with a width/height of 0!
+	$aspect_ratio = min($max_width / $width, $max_height / $height);
+	$width  = (int) ceil($width * $aspect_ratio);
+	$height = (int) ceil($height * $aspect_ratio);
+	return true;
 }
 
 ?>

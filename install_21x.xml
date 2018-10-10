@@ -267,26 +267,20 @@
 			// Begin Automatic Attachment Rotation (and Resize) mod.
 			if ($attachmentData[$i]['is_image'] && $modSettings['attachment_resize_existing'])
 			{
-				// Get the file path
+				// Get the file path and file size:
 				$filename = getAttachmentFilename($attachment['filename'], $attachment['id_attach'], $attachment['id_folder']);
 				list ($width, $height, $type) = @getimagesize($filename);
 
-				// If it's a BMP image, or it's not a JPEG image  and image reformat is true,
-				// or attachment image width/height values are set and it's too wide/high,
-				// or it's not a BMP image and it's too large ...
-				$sizeLimit = !empty($modSettings['attachmentSizeLimit']) ? max(0, $modSettings['attachmentSizeLimit']) * 1024 : 0;
-				if ($type == 6 || ($type != 2 && $modSettings['attachment_image_reformat'])
-					|| (!empty($modSettings['attachment_image_width']) && $modSettings['attachment_image_width'] > 0 && $width > $modSettings['attachment_image_width'])
-					|| (!empty($modSettings['attachment_image_height']) && $modSettings['attachment_image_height'] > 0 && $height > $modSettings['attachment_image_height'])
-					|| ($type != 6 && !empty($sizeLimit) && $_FILES['attachment']['size'][$index] > $sizeLimit))
+				// Adjust size of image, maintaining aspect ratio of image:
+				require_once($sourcedir . '/Subs-AutoRotation.php');
+				if (AutoRotation_Aspect($width, $height))
 				{
-					// What size will we make this image?
-					$width = empty($modSettings['attachment_image_width']) ? $width : min($width, $modSettings['attachment_image_width']);
-					$height = empty($modSettings['attachment_image_height']) ? $height : min($height, $modSettings['attachment_image_height']);
+					// What quality will we make this image?
+					$jpegQuality = empty($modSettings['attachment_jpeg_quality']) ? 100 : $modSettings['attachment_jpeg_quality'];
 
 					// Resize it
 					require_once($sourcedir . '/Subs-Graphics.php');
-					if (resizeImageFile($filename, $filename . '.temp', $width, $height))
+					if (resizeImageFile($filename, $filename . '.temp', $width, $height, '', $jpegQuality))
 					{
 						unlink($filename);
 						rename($filename . '.temp', $filename);
@@ -300,8 +294,9 @@
 						$attachmentData[$i]['size'] = round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'];
 
 						// Change the filename if necessary.
-						if (($type == 6 || $modSettings['attachment_image_reformat']) && strrchr($attachment['filename'], '.') != '.jpg')
+						if ($modSettings['attachment_image_reformat'] && strrchr($attachment['filename'], '.') != '.jpg')
 						{
+							// Change the file suffix to 'jpg' if necessary.
 							$attachment['filename'] = substr($attachment['filename'], 0, -(strlen(strrchr($attachment['filename'], '.')))) . '.jpg';
 							$attachmentData[$i]['name'] = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename']));
 
@@ -362,6 +357,27 @@
 	<operation>	<!-- line 1574 -->
 		<search position="before"><![CDATA['href' => $scripturl . '?action=dlattach;topic=' . $attachment['topic'] . '.0;attach=' . $attachment['id_thumb'] . ';image']]></search>
 		<add><![CDATA[ . ';ts=' . $time]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Subs-Graphics.php">
+	<!-- resizeImageFile function -->
+	<operation>	<!-- line 309 -->
+		<search position="before"><![CDATA[function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0]]></search>
+		<add><![CDATA[, $jpegQuality = 100]]></add>
+	</operation>
+	<operation>	<!-- line 374 -->
+		<search position="before"><![CDATA[resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, true, $preferred_format]]></search>
+		<add><![CDATA[, $jpegQuality]]></add>
+	</operation>
+	
+	<!-- resizeImage function -->
+	<operation>	<!-- line 382 -->
+		<search position="before"><![CDATA[function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0]]></search>
+		<add><![CDATA[, $jpegQuality = 0]]></add>
+	</operation>
+	<operation>	<!-- line 443 -->
+		<search position="before"><![CDATA[$success = imagejpeg($dst_img, $destName, ]]></search>
+		<add><![CDATA[$jpegQuality ? min($jpegQuality, 100) : ]]></add>
 	</operation>
 </file>
 <file name="$sourcedir/Subs-PMAttachmentsAdmin.php" error="skip">

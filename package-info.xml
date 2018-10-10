@@ -5,7 +5,7 @@
 	<id>Dougiefresh:AutoRotation</id>
 	<name>Automatic Attachment Rotation (and Resize)</name>
 	<type>modification</type>
-	<version>4.1</version>
+	<version>4.3</version>
 
 	<install for="2.0 - 2.0.99">
 		<readme parsebbc="true">readme.txt</readme>
