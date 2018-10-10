@@ -1,3 +1,6 @@
+v3.7 - September 12th, 2017
+o Resolved conflict with [url=http://custom.simplemachines.org/mods/index.php?mod=3770]Post and PM Inline Attachments[/url].  No functionality change.
+
 v3.6 - September 8th, 2017
 o Fixed 2 syntax errors in [b]Subs-AutoRotation.php[/b].
 
