@@ -3,7 +3,7 @@
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 <id>Dougiefresh:AutoRotation</id>
 <name>Automatic Attachment Rotation (and Resize)</name>
-<version>4.5</version>
+<version>4.6</version>
 
 <file name="$sourcedir/Display.php">
 	<!-- Display function -->
@@ -98,8 +98,8 @@
 					$preferred_format = $type;
 
 				// Find out the image JPEG quality and the maximum JPEG quality.
-				$jpegQuality = !empty($attachmentData[$i]['jpeg_quality']) ? $attachmentData[$i]['jpeg_quality'] : 100;
-				$max_jpegQuality = empty($modSettings['attachment_jpeg_quality']) ? 100 : $modSettings['attachment_jpeg_quality'];
+				$jpegQuality = $jpegQuality = $attachmentData[$i]['jpeg_quality'];
+				$max_jpegQuality = min(100, empty($modSettings['attachment_jpeg_quality']) ? 100 : $modSettings['attachment_jpeg_quality']);
 
 				// If the image needs to be resized, saved with a lower JPEG quality,
 					// or it's not a JPEG image and it needs to be reformatted to JPEG ...
@@ -126,12 +126,16 @@
 						$attachmentData[$i]['size'] = round($attachment['filesize'] / 1024, 2) . ' ' . $txt['kilobyte'];
 						$attachment['jpeg_quality'] = $jpegQuality;
 
-						// Change the filename if necessary.
-						if (!empty($modSettings['attachment_image_reformat']) && strrchr($attachment['filename'], '.') != '.jpg')
+						// Update the image attachment details.
+						if ($preferred_format == 2)
 						{
 							// Change the file suffix to 'jpg' if necessary.
-							$attachment['filename'] = substr($attachment['filename'], 0, -(strlen(strrchr($attachment['filename'], '.')))) . '.jpg';
-							$attachmentData[$i]['name'] = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename']));
+							if (strrchr($attachment['filename'], '.') != '.jpg')
+							{
+								$attachment['filename'] = substr($attachment['filename'], 0, -(strlen(strrchr($attachment['filename'], '.')))) . '.jpg';
+								$attachmentData[$i]['name'] = preg_replace('~&amp;#(\\d{1,7}|x[0-9a-fA-F]{1,6});~', '&#\\1;', htmlspecialchars($attachment['filename']));
+							}
+
 							$smcFunc['db_query']('', '
 								UPDATE {db_prefix}attachments
 								SET width = {int:width},
@@ -161,14 +165,12 @@
 								UPDATE {db_prefix}attachments
 								SET width = {int:width},
 									height = {int:height},
-									jpeg_quality = {int:jpeg_quality},
 									size = {int:size}
 								WHERE id_attach = {int:id_attach}
 								LIMIT 1',
 								array(
 									'width' => $attachment['width'],
 									'height' => $attachment['height'],
-									'jpeg_quality' => $attachment['jpeg_quality'],
 									'size' => $attachment['filesize'],
 									'id_attach' => $attachment['id_attach'],
 								)
@@ -227,9 +229,13 @@
 	<operation>	<!-- line 184 -->
 		<search position="after"><![CDATA[			// Thumbnail settings.
 ]]></search>
-		<add><![CDATA[			// Added for resizing attachments.
+		<add><![CDATA[			// Added for automatic rotation of image attachments.
+			// Enable/disable automatic image rotation.
 			array('check', 'attachment_auto_rotate'),
+			// Log rotation error setting.
+			array('check', 'AutoRotation_log_error'),
 		'',
+			// Added for reformatting/resizing attachments.
 			array('check', 'attachment_image_reformat'),
 			array('check', 'attachment_resize_existing'),
 			array('int', 'attachment_jpeg_quality', 6),
@@ -237,13 +243,6 @@
 			array('int', 'attachment_image_height', 6),
 		'',
 ]]></add>
-	</operation>
-	<operation>	<!-- line 189 -->
-		<search position="before"><![CDATA[array('text', 'attachmentThumbHeight', 6),]]></search>
-		<add><![CDATA[
-		'',
-			// Log rotation error setting
-			array('check', 'AutoRotation_log_error'),]]></add>
 	</operation>
 
 	<!-- BrowseFiles function -->
@@ -308,9 +307,9 @@
 ]]></search>
 		<add><![CDATA[
 
-			// Automatic Attachment Rotation (and Resize) alteration:
-			require_once($sourcedir . '/Subs-AutoRotation.php');
-			AutoRotation_Inbound($n, true);]]></add>
+				// Automatic Attachment Rotation (and Resize) alteration:
+				require_once($sourcedir . '/Subs-AutoRotation.php');
+				AutoRotation_Inbound($n, true);]]></add>
 	</operation>
 </file>
 <file name="$sourcedir/Post.php">
@@ -327,11 +326,8 @@
 ]]></search>
 		<add><![CDATA[
 				// Automatic Attachment Rotation (and Resize) alteration:
-				if (!empty($modSettings['attachment_auto_rotate']))
-				{
-					require_once($sourcedir . '/Subs-AutoRotation.php');
-					AutoRotation_Inbound($n);
-				}
+				require_once($sourcedir . '/Subs-AutoRotation.php');
+				AutoRotation_Inbound($n);
 ]]></add>
 	</operation>
 
@@ -355,14 +351,11 @@
 	</operation>
 	<operation>	<!-- line 1763 -->
 		<search position="after"><![CDATA[
-				// Check the total upload size for this post...]]></search>
+			// Check the total upload size for this post...]]></search>
 		<add><![CDATA[
-				// Automatic Attachment Rotation (and Resize) alteration:
-				if (!empty($modSettings['attachment_auto_rotate']))
-				{
-					require_once($sourcedir . '/Subs-AutoRotation.php');
-					AutoRotation_Inbound($n);
-				}
+			// Automatic Attachment Rotation (and Resize) alteration:
+			require_once($sourcedir . '/Subs-AutoRotation.php');
+			AutoRotation_Inbound($n);
 ]]></add>
 	</operation>
 </file>

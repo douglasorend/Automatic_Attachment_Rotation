@@ -1,9 +1,9 @@
 <?php
 /**********************************************************************************
-* Subs-AutoRotation.php                                                           *
+* Subs-AutoRotation.php														   *
 ***********************************************************************************
 * This mod is licensed under the 2-clause BSD License, which can be found here:   *
-*	http://opensource.org/licenses/BSD-2-Clause                                   *
+*	http://opensource.org/licenses/BSD-2-Clause								   *
 ***********************************************************************************
 * This program is distributed in the hope that it is and will be useful, but	  *
 * WITHOUT ANY WARRANTIES; without even any implied warranty of MERCHANTABILITY	  *
@@ -509,7 +509,7 @@ function AutoRotation_Inbound($index, $pm = false)
 	$imageSize = @getimagesize($filename);
 
 	// If it's a JPEG image rotate it if necessary.
-	if ($imageSize['mime'] == 'image/jpeg')
+	if (!empty($modSettings['attachment_auto_rotate']) && $imageSize['mime'] == 'image/jpeg')
 	{
 		// Disable image reencoding to enable image rotation.
 		$modSettings['attachment_image_reencode'] = false;
@@ -551,7 +551,9 @@ function AutoRotation_Inbound($index, $pm = false)
 	{
 		if ((AutoRotation_Aspect($width, $height, $pre) || empty($sizeLimit)))
 		{
-			if (!empty($modSettings[$pre . 'attachment_image_reformat']))
+			// If the image should be reformatted to JPEG.
+			// Note: By default BMP images are reformatted to JPEG by resizeImageFile().
+			if (!empty($modSettings[$pre . 'attachment_image_reformat']) || $type == 6 )
 				$preferred_format = 2;
 			else
 				$preferred_format = $type;
@@ -565,7 +567,7 @@ function AutoRotation_Inbound($index, $pm = false)
 				rename($filename . '.temp', $filename);
 
 				// If it's a JPEG image rotate and/or compress the image.
-				if (($imageSize['mime'] == 'image/jpeg' && !$imageRotated) || !empty($modSettings[$pre . 'attachment_image_reformat']))
+				if (!empty($modSettings['attachment_auto_rotate'])  && ($imageSize['mime'] == 'image/jpeg' && !$imageRotated))
 				{
 					// Disable image reencoding to enable image rotation.
 					$modSettings['attachment_image_reencode'] = false;
@@ -574,7 +576,7 @@ function AutoRotation_Inbound($index, $pm = false)
 					$image = @imagecreatefromjpeg($filename);
 
 					// Rotate JPEG image according to Exif orientation.
-					if ($imageSize['mime'] == 'image/jpeg' && (isset($imageExif['Orientation']) || array_key_exists('Orientation', $imageExif)))
+					if (isset($imageExif['Orientation']) || array_key_exists('Orientation', $imageExif))
 					{
 						$imageOrientation = $imageExif['Orientation'];
 						switch($imageOrientation)
@@ -601,12 +603,8 @@ function AutoRotation_Inbound($index, $pm = false)
 
 				// Change the file suffix to 'jpg' if necessary.
 				$filename = $_FILES['attachment']['name'][$index];
-				if (!empty($modSettings[$pre . 'attachment_image_reformat']) && strrchr($filename, '.') != '.jpg')
-					$filename = substr($filename, 0, -(strlen(strrchr($filename, '.')))) . '.jpg';
-
-				// Find out image mime type.
-				$filename = $_FILES['attachment']['tmp_name'][$index];
-				$imageSize = @getimagesize($filename);
+				if ($preferred_format = 2 && strrchr($filename, '.') != '.jpg')
+					$_FILES['attachment']['name'][$index] = substr($filename, 0, -(strlen(strrchr($filename, '.')))) . '.jpg';
 			}
 		}
 	}
