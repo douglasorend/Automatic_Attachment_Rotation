@@ -44,7 +44,7 @@ $txt['pm_attachment_image_height'] = 'Maximum height of attached images<div clas
 
 $helptxt['attachment_image_reformat'] = 'Selecting this option will reformat non-JPEG images as JPEG';
 $helptxt['attachment_resize_existing'] = 'Selecting this option will resize any existing images which are larger than the set dimensions for attached images.';
-$helptxt['attachment_resize_backup'] = 'If this option is enabled (and the option <i>\'Resize existing images\'</i> is also enabled) the original image file will be kept in the <i>attachmentsPreREI<i> directory.';
+$helptxt['attachment_resize_backup'] = 'If this option is enabled (and the option <i>\'Resize existing images\'</i> is also enabled) the original image file is saved in the directory <i>attachmentsPreREI</i> in the default forum directory.';
 $helptxt['attachment_jpeg_quality'] = 'This sets the JPEG quality factor. A higher number increases image quality but also increases the attachment file size.';
 $helptxt['pm_attachment_image_reformat'] = 'Selecting this option will reformat non-JPEG images as JPEG';
 $helptxt['pm_attachment_jpeg_quality'] = 'This sets the JPEG quality factor. A higher number increases image quality but also increases the attachment file size.';

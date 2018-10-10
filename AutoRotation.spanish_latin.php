@@ -29,6 +29,7 @@ $txt['AutoRotation_log_error'] = '&iquest;Error de memoria de registro al girar 
 $txt['AutoRotation_memory_issue'] = 'No se puede asignar %1$d de memoria para la rotaci&oacute;n de la imagen.';
 
 // Added for Automatic Attachment Rotation (and Resize).
+//$txt['attachment_auto_rotate'] = 'Automatically rotate images<div class="smalltext">(Only possible for JPEG images containing EXIF orientation data)</div>';
 //$txt['attachment_image_reformat'] = 'Reformat non-JPEG images to JPEG';
 //$txt['attachment_resize_existing'] = 'Resize existing images';
 //$txt['attachment_resize_backup'] = 'Keep backup of original image file when resizing';
@@ -43,7 +44,7 @@ $txt['AutoRotation_memory_issue'] = 'No se puede asignar %1$d de memoria para la
 
 //$helptxt['attachment_image_reformat'] = 'Selecting this option will reformat non-JPEG images as JPEG';
 //$helptxt['attachment_resize_existing'] = 'Selecting this option will resize any existing images which are larger than the set dimensions for attached images.';
-//$helptxt['attachment_resize_backup'] = 'If this option is enabled (and the option <i>\'Resize existing images\'</i> is also enabled) the original image file will be kept in the <i>attachmentsPreREI<i> directory.';
+//$helptxt['attachment_resize_backup'] = 'If this option is enabled (and the option <i>\'Resize existing images\'</i> is also enabled) the original image file is saved in the directory <i>attachmentsPreREI</i> in the default forum directory.';
 //$helptxt['attachment_jpeg_quality'] = 'This sets the JPEG quality factor. A higher number increases image quality but also increases the attachment file size.';
 //$helptxt['pm_attachment_image_reformat'] = 'Selecting this option will reformat non-JPEG images as JPEG';
 //$helptxt['pm_attachment_jpeg_quality'] = 'This sets the JPEG quality factor. A higher number increases image quality but also increases the attachment file size.';

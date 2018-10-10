@@ -1,3 +1,7 @@
+V5.4 - May 1st, 2018
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970720#msg3970720]@rjen[/url] - updated Dutch language files.
+o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970759#msg3970759]Rock Lee[/url] - fixed text formatting error for [i]attachmentsPreREI[/i] directory name text string in language files and updated help text/description relating to the saving of original image files to the [i]attachmentsPreREI[/i] directory.
+
 V5.3 - April 30th, 2018
 o Per [url=https://www.simplemachines.org/community/index.php?topic=544111.msg3970490#msg3970490]@rjen[/url] - updated Dutch language files for 'Resize Exisitng Images'.
 o Updated English language files for 'Resize Exisitng Images' to provide more detailed description for manual/batch options.
